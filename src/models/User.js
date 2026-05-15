@@ -69,14 +69,13 @@ const userSchema = new mongoose.Schema({
       enum: ['free', 'starter', 'pro', 'enterprise'],
       default: 'free'
     },
-    // Max rules allowed per plan
     maxRules: {
       type: Number,
-      default: 5 // free = 5, starter = 25, pro = 100, enterprise = unlimited
+      default: 5
     },
     startDate: {
       type: Date,
-      default: Date.now
+      default: null
     },
     endDate: {
       type: Date,
@@ -85,6 +84,22 @@ const userSchema = new mongoose.Schema({
     isActive: {
       type: Boolean,
       default: true
+    },
+    couponUsed: {
+      type: String,
+      default: ''
+    },
+    paymentMethod: {
+      type: String,
+      default: ''
+    },
+    amount: {
+      type: Number,
+      default: 0
+    },
+    transactionId: {
+      type: String,
+      default: ''
     }
   },
 

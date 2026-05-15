@@ -52,6 +52,7 @@
     <nav class="sidebar-nav">
       <a href="#" class="nav-item active" data-section="overview"><i class="fas fa-chart-pie"></i><span>Overview</span></a>
       <a href="#" class="nav-item" data-section="users"><i class="fas fa-users"></i><span>All Users</span></a>
+      <a href="#" class="nav-item" data-section="coupons"><i class="fas fa-ticket"></i><span>Coupons</span></a>
       <a href="/dashboard" class="nav-item"><i class="fas fa-desktop"></i><span>My Dashboard</span></a>
       <a href="/" class="nav-item"><i class="fas fa-globe"></i><span>View Site</span></a>
     </nav>
@@ -111,6 +112,31 @@
           </div>
         </div>
       </section>
+
+      <!-- Coupons -->
+      <section id="section-coupons" class="section">
+        <div class="card">
+          <div class="card-header"><h2><i class="fas fa-ticket"></i> Create Coupon</h2></div>
+          <div style="padding:24px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+              <div class="form-group"><label>Code</label><input type="text" id="couponCode" placeholder="e.g. SAVE20" style="text-transform:uppercase;"></div>
+              <div class="form-group"><label>Discount (%)</label><input type="number" id="couponDiscount" placeholder="e.g. 20" min="1" max="100"></div>
+              <div class="form-group"><label>Max Uses</label><input type="number" id="couponMaxUses" value="100"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group"><label>For Plan</label>
+                <select id="couponPlan"><option value="all">All Plans</option><option value="starter">Starter</option><option value="pro">Pro</option><option value="enterprise">Enterprise</option></select>
+              </div>
+              <div class="form-group"><label>Expires At</label><input type="date" id="couponExpires"></div>
+            </div>
+            <button class="btn btn-primary" onclick="createCoupon()"><i class="fas fa-plus"></i> Create Coupon</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2><i class="fas fa-list"></i> All Coupons</h2></div>
+          <div id="couponsContainer" style="padding:16px 24px;"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -120,6 +146,17 @@
       <h2><i class="fas fa-user-edit"></i> Manage User</h2>
       <div class="form-group"><label>Name</label><input type="text" id="editName"></div>
       <div class="form-group"><label>Email</label><input type="email" id="editEmail"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label>Status</label>
+          <select id="editStatus"><option value="true">Active</option><option value="false">Suspended</option></select>
+        </div>
+        <div class="form-group"><label>Role</label>
+          <select id="editRole"><option value="user">User</option><option value="admin">Admin</option></select>
+        </div>
+      </div>
+
+      <hr style="margin:16px 0;border:none;border-top:1px solid var(--border);">
+      <h3 style="font-size:0.95rem;margin-bottom:12px;"><i class="fas fa-crown" style="color:#d97706;"></i> Subscription</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="form-group"><label>Plan</label>
           <select id="editPlan" onchange="updateMaxRules()">
@@ -132,13 +169,16 @@
         <div class="form-group"><label>Max Rules</label><input type="number" id="editMaxRules" value="5"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group"><label>Status</label>
-          <select id="editStatus"><option value="true">Active</option><option value="false">Suspended</option></select>
-        </div>
-        <div class="form-group"><label>Role</label>
-          <select id="editRole"><option value="user">User</option><option value="admin">Admin</option></select>
-        </div>
+        <div class="form-group"><label>Start Date</label><input type="date" id="editStartDate"></div>
+        <div class="form-group"><label>End Date (Expiry)</label><input type="date" id="editEndDate"></div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div class="form-group"><label>Amount (BDT)</label><input type="number" id="editAmount" value="0"></div>
+        <div class="form-group"><label>Payment Method</label><input type="text" id="editPayment" placeholder="bKash/Nagad"></div>
+        <div class="form-group"><label>Transaction ID</label><input type="text" id="editTxnId" placeholder="TXN123"></div>
+      </div>
+      <div class="form-group"><label>Coupon Used</label><input type="text" id="editCoupon" placeholder="Coupon code if any"></div>
+
       <hr style="margin:16px 0;border:none;border-top:1px solid var(--border);">
       <h3 style="font-size:0.95rem;margin-bottom:12px;"><i class="fas fa-link" style="color:var(--primary);"></i> Page Details</h3>
       <div class="form-group"><label>Page Name</label><input type="text" id="editPageName"></div>
@@ -165,7 +205,7 @@
     let allUsers = [];
     let editingUserId = null;
 
-    document.addEventListener('DOMContentLoaded', () => { fetchStats(); fetchUsers(); setupNav(); });
+    document.addEventListener('DOMContentLoaded', () => { fetchStats(); fetchUsers(); fetchCoupons(); setupNav(); });
 
     function setupNav() {
       document.querySelectorAll('.nav-item[data-section]').forEach(item => {
@@ -259,6 +299,12 @@
       document.getElementById('editMaxRules').value = u.subscription?.maxRules || 5;
       document.getElementById('editStatus').value = String(u.isActive);
       document.getElementById('editRole').value = u.role || 'user';
+      document.getElementById('editStartDate').value = u.subscription?.startDate ? new Date(u.subscription.startDate).toISOString().split('T')[0] : '';
+      document.getElementById('editEndDate').value = u.subscription?.endDate ? new Date(u.subscription.endDate).toISOString().split('T')[0] : '';
+      document.getElementById('editAmount').value = u.subscription?.amount || 0;
+      document.getElementById('editPayment').value = u.subscription?.paymentMethod || '';
+      document.getElementById('editTxnId').value = u.subscription?.transactionId || '';
+      document.getElementById('editCoupon').value = u.subscription?.couponUsed || '';
       document.getElementById('editPageName').value = u.pageDetails?.pageName || '';
       document.getElementById('editPageId').value = u.pageDetails?.pageId || '';
       document.getElementById('editPageToken').value = u.pageDetails?.pageAccessToken || '';
@@ -292,10 +338,15 @@
           body: JSON.stringify({
             plan: document.getElementById('editPlan').value,
             maxRules: parseInt(document.getElementById('editMaxRules').value),
-            isActive: true
+            isActive: true,
+            startDate: document.getElementById('editStartDate').value || null,
+            endDate: document.getElementById('editEndDate').value || null,
+            amount: parseInt(document.getElementById('editAmount').value) || 0,
+            paymentMethod: document.getElementById('editPayment').value,
+            transactionId: document.getElementById('editTxnId').value,
+            couponUsed: document.getElementById('editCoupon').value
           })
         });
-        // Update page details via admin
         await fetch(`/api/admin/users/${editingUserId}/page`, {
           method: 'PUT', headers: authHeaders(),
           body: JSON.stringify({
@@ -334,6 +385,66 @@
       t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
       document.getElementById('toastContainer').appendChild(t);
       setTimeout(() => t.remove(), 3000);
+    }
+
+    // ============ COUPONS ============
+    async function fetchCoupons() {
+      try {
+        const res = await fetch('/api/admin/coupons', { headers: authHeaders() });
+        const data = await res.json();
+        if (data.success) renderCoupons(data.data);
+      } catch (e) {}
+    }
+
+    function renderCoupons(coupons) {
+      const container = document.getElementById('couponsContainer');
+      if (!coupons.length) { container.innerHTML = '<p style="color:var(--gray);padding:20px;">No coupons yet.</p>'; return; }
+      container.innerHTML = coupons.map(c => `
+        <div class="user-card" style="padding:14px;">
+          <div style="flex:1;">
+            <strong style="font-size:1.1rem;color:var(--primary);">${c.code}</strong>
+            <span class="plan-badge plan-${c.plan}" style="margin-left:8px;">${c.plan}</span>
+            <span style="margin-left:8px;color:var(--success);font-weight:700;">${c.discount}% OFF</span>
+            <div style="font-size:0.8rem;color:var(--gray);margin-top:4px;">
+              Used: ${c.usedCount}/${c.maxUses} | 
+              ${c.expiresAt ? 'Expires: ' + new Date(c.expiresAt).toLocaleDateString() : 'No expiry'} |
+              ${c.isActive ? '🟢 Active' : '🔴 Inactive'}
+            </div>
+          </div>
+          <button class="btn btn-danger" onclick="deleteCoupon('${c._id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
+    }
+
+    async function createCoupon() {
+      const code = document.getElementById('couponCode').value.trim();
+      const discount = parseInt(document.getElementById('couponDiscount').value);
+      const maxUses = parseInt(document.getElementById('couponMaxUses').value) || 100;
+      const plan = document.getElementById('couponPlan').value;
+      const expiresAt = document.getElementById('couponExpires').value || null;
+
+      if (!code || !discount) { showToast('Code and discount required', 'error'); return; }
+
+      try {
+        const res = await fetch('/api/admin/coupons', {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ code, discount, maxUses, plan, expiresAt })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Coupon created!', 'success');
+          document.getElementById('couponCode').value = '';
+          document.getElementById('couponDiscount').value = '';
+          fetchCoupons();
+        } else { showToast(data.message, 'error'); }
+      } catch (e) { showToast('Error creating coupon', 'error'); }
+    }
+
+    async function deleteCoupon(id) {
+      if (!confirm('Delete this coupon?')) return;
+      await fetch(`/api/admin/coupons/${id}`, { method: 'DELETE', headers: authHeaders() });
+      showToast('Coupon deleted', 'success');
+      fetchCoupons();
     }
   </script>
 </body>

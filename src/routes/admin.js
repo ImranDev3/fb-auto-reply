@@ -17,6 +17,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Rule = require('../models/Rule');
 const Settings = require('../models/Settings');
+const Coupon = require('../models/Coupon');
 const { protect } = require('../middleware/auth');
 const { adminOnly } = require('../middleware/admin');
 
@@ -81,15 +82,25 @@ router.put('/users/:id', async (req, res) => {
 // ============ UPDATE SUBSCRIPTION ============
 router.put('/users/:id/subscription', async (req, res) => {
   try {
-    const { plan, maxRules, isActive, endDate } = req.body;
+    const { plan, maxRules, isActive, startDate, endDate, couponUsed, paymentMethod, amount, transactionId } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
     if (plan) user.subscription.plan = plan;
     if (maxRules) user.subscription.maxRules = maxRules;
     if (isActive !== undefined) user.subscription.isActive = isActive;
-    if (endDate) user.subscription.endDate = endDate;
-    user.subscription.startDate = new Date();
+    if (startDate) user.subscription.startDate = new Date(startDate);
+    if (endDate) user.subscription.endDate = new Date(endDate);
+    if (couponUsed !== undefined) user.subscription.couponUsed = couponUsed;
+    if (paymentMethod !== undefined) user.subscription.paymentMethod = paymentMethod;
+    if (amount !== undefined) user.subscription.amount = amount;
+    if (transactionId !== undefined) user.subscription.transactionId = transactionId;
+
+    // Auto-set maxRules based on plan if not provided
+    if (plan && !maxRules) {
+      const limits = { free: 5, starter: 25, pro: 100, enterprise: 99999 };
+      user.subscription.maxRules = limits[plan] || 5;
+    }
 
     await user.save();
     res.json({ success: true, data: user });
@@ -130,6 +141,37 @@ router.delete('/users/:id', async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
 
     res.json({ success: true, message: 'User and all data deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ============ COUPONS ============
+router.get('/coupons', async (req, res) => {
+  try {
+    const coupons = await Coupon.find().sort({ createdAt: -1 });
+    res.json({ success: true, data: coupons });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+router.post('/coupons', async (req, res) => {
+  try {
+    const { code, discount, plan, maxUses, expiresAt } = req.body;
+    if (!code || !discount) return res.status(400).json({ success: false, message: 'Code and discount required' });
+    const coupon = await Coupon.create({ code, discount, plan: plan || 'all', maxUses: maxUses || 100, expiresAt: expiresAt || null });
+    res.status(201).json({ success: true, data: coupon });
+  } catch (error) {
+    if (error.code === 11000) return res.status(400).json({ success: false, message: 'Coupon code already exists' });
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+router.delete('/coupons/:id', async (req, res) => {
+  try {
+    await Coupon.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Coupon deleted' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }

@@ -37,6 +37,15 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Account is deactivated.' });
     }
 
+    // Check subscription expiry
+    if (user.subscription.endDate && new Date(user.subscription.endDate) < new Date()) {
+      // Subscription expired - downgrade to free
+      user.subscription.plan = 'free';
+      user.subscription.maxRules = 5;
+      user.subscription.isActive = false;
+      await user.save();
+    }
+
     // Attach user to request
     req.user = user;
     next();
