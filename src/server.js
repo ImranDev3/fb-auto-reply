@@ -100,6 +100,17 @@ app.use('/api/admin', adminRoutes);
 // Products/Services API
 app.use('/api/products', productRoutes);
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    success: true, 
+    status: 'online',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    version: '2.0.0'
+  });
+});
+
 // ============ START SERVER ============
 
 const PORT = process.env.PORT || 3000;

@@ -59,8 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchBusinessDetails();
   setupNavigation();
   setupFilterButtons();
+  checkSystemStatus();
 
-  // Show admin link if user is admin
+  // Check admin access
   checkAdminAccess();
 });
 
@@ -478,6 +479,26 @@ function escapeHtml(text) {
 
 function escapeAttr(text) {
   return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// ============ SYSTEM STATUS CHECK ============
+async function checkSystemStatus() {
+  const statusEl = document.getElementById('systemStatus');
+  try {
+    const res = await fetch('/api/health');
+    const data = await res.json();
+    if (data.success && data.status === 'online') {
+      statusEl.innerHTML = '<i class="fas fa-circle" style="font-size:0.5rem;"></i> System Active';
+      statusEl.style.background = '#ecfdf5';
+      statusEl.style.color = '#059669';
+    }
+  } catch (e) {
+    statusEl.innerHTML = '<i class="fas fa-sync fa-spin"></i> Updating...';
+    statusEl.style.background = '#fef3c7';
+    statusEl.style.color = '#d97706';
+    // Retry after 10 seconds
+    setTimeout(checkSystemStatus, 10000);
+  }
 }
 
 // ============ AI CONTEXT (Rules page) ============
