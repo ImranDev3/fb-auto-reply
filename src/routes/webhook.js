@@ -47,11 +47,12 @@ router.post('/', async (req, res) => {
           if (event.message && event.message.text) {
             const senderId = event.sender.id;
             const messageText = event.message.text;
+            const recipientId = event.recipient.id; // This is the Page ID
 
             console.log(`📩 Message received from ${senderId}: "${messageText}"`);
 
             // Process the message and send auto-reply if keyword matches
-            await handleIncomingMessage(senderId, messageText);
+            await handleIncomingMessage(senderId, messageText, recipientId);
           }
         }
       }

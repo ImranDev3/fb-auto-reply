@@ -57,6 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchProfile();
   setupNavigation();
   setupFilterButtons();
+
+  // Show admin link if user is admin
+  checkAdminAccess();
 });
 
 // ============ LOGOUT ============
@@ -468,4 +471,16 @@ function escapeHtml(text) {
 
 function escapeAttr(text) {
   return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// ============ ADMIN CHECK ============
+async function checkAdminAccess() {
+  try {
+    const res = await fetch('/api/auth/me', { headers: authHeaders() });
+    const data = await res.json();
+    if (data.success && data.data.role === 'admin') {
+      const adminLink = document.getElementById('adminLink');
+      if (adminLink) adminLink.style.display = 'flex';
+    }
+  } catch (e) {}
 }

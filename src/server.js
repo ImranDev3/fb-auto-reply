@@ -20,6 +20,7 @@ const rulesRoutes = require('./routes/rules');
 const whatsappRoutes = require('./routes/whatsapp');
 const settingsRoutes = require('./routes/settings');
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
 
 // Create Express app
 const app = express();
@@ -67,6 +68,11 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
+// Admin Panel
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'admin.html'));
+});
+
 // Serve static frontend files from 'public' folder
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -86,6 +92,9 @@ app.use('/api/settings', settingsRoutes);
 
 // Auth API (register, login, profile)
 app.use('/api/auth', authRoutes);
+
+// Admin API (manage users, subscriptions)
+app.use('/api/admin', adminRoutes);
 
 // ============ START SERVER ============
 
