@@ -18,6 +18,7 @@ const connectDB = require('./config/db');
 const webhookRoutes = require('./routes/webhook');
 const rulesRoutes = require('./routes/rules');
 const whatsappRoutes = require('./routes/whatsapp');
+const settingsRoutes = require('./routes/settings');
 
 // Create Express app
 const app = express();
@@ -43,6 +44,9 @@ app.use('/whatsapp', whatsappRoutes);
 
 // Auto-reply rules CRUD API
 app.use('/api/rules', rulesRoutes);
+
+// Settings API
+app.use('/api/settings', settingsRoutes);
 
 // Serve the dashboard at root URL
 app.get('/', (req, res) => {

@@ -3,27 +3,42 @@
  * 
  * Handles:
  * 1. Matching incoming WhatsApp messages with keyword rules from DB
- * 2. Sending replies via WhatsApp Cloud API
+ * 2. Default reply when no keyword matches (away mode)
+ * 3. Sending replies via WhatsApp Cloud API
  */
 
 const axios = require('axios');
 const Rule = require('../models/Rule');
+const Settings = require('../models/Settings');
 
 // WhatsApp Cloud API URL
 const WA_API_URL = 'https://graph.facebook.com/v18.0';
 
 /**
- * Handle an incoming WhatsApp message:
- * - Search for matching keyword in DB
- * - If found, send the auto-reply via WhatsApp
+ * Handle an incoming WhatsApp message
  */
 async function handleWhatsAppMessage(phoneNumberId, senderPhone, messageText) {
   try {
+    // Get settings
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = await Settings.create({});
+    }
+
+    // Check if auto-reply is enabled
+    if (!settings.isAutoReplyEnabled) {
+      console.log('⏸️ Auto-reply is disabled. Skipping WhatsApp reply.');
+      return;
+    }
+
     // Convert message to lowercase for case-insensitive matching
     const lowerMessage = messageText.toLowerCase().trim();
 
-    // Search for matching rules in database
-    const rules = await Rule.find({ isActive: true });
+    // Search for matching rules (only whatsapp and both platform rules)
+    const rules = await Rule.find({
+      isActive: true,
+      platform: { $in: ['whatsapp', 'both'] }
+    });
 
     let matchedRule = null;
 
@@ -37,10 +52,12 @@ async function handleWhatsAppMessage(phoneNumberId, senderPhone, messageText) {
     if (matchedRule) {
       console.log(`✅ WhatsApp: Keyword "${matchedRule.keyword}" matched. Sending reply...`);
       await sendWhatsAppMessage(phoneNumberId, senderPhone, matchedRule.reply);
+    } else if (settings.isAwayMode) {
+      // No keyword matched but away mode is ON - send default reply
+      console.log(`🌙 WhatsApp: No keyword matched. Away mode ON - sending default reply.`);
+      await sendWhatsAppMessage(phoneNumberId, senderPhone, settings.defaultReply);
     } else {
-      console.log(`ℹ️ WhatsApp: No keyword matched for: "${messageText}"`);
-      // Uncomment below for default reply:
-      // await sendWhatsAppMessage(phoneNumberId, senderPhone, "Thanks for your message! We'll get back to you soon.");
+      console.log(`ℹ️ WhatsApp: No keyword matched and away mode is OFF. No reply sent.`);
     }
   } catch (error) {
     console.error('❌ Error handling WhatsApp message:', error.message);
@@ -49,10 +66,6 @@ async function handleWhatsAppMessage(phoneNumberId, senderPhone, messageText) {
 
 /**
  * Send a WhatsApp message via Cloud API
- * 
- * @param {string} phoneNumberId - Your WhatsApp Business phone number ID
- * @param {string} to - Recipient's phone number (with country code)
- * @param {string} messageText - The text message to send
  */
 async function sendWhatsAppMessage(phoneNumberId, to, messageText) {
   try {

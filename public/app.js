@@ -29,6 +29,7 @@ let currentFilter = 'all';
 // ============ LOAD ON PAGE LOAD ============
 document.addEventListener('DOMContentLoaded', () => {
   fetchRules();
+  fetchSettings();
   setupFilterButtons();
 });
 
@@ -240,4 +241,53 @@ function escapeHtml(text) {
 
 function escapeAttr(text) {
   return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// ============ SETTINGS ============
+async function fetchSettings() {
+  try {
+    const response = await fetch('/api/settings');
+    const data = await response.json();
+
+    if (data.success) {
+      const s = data.data;
+      document.getElementById('toggleAutoReply').checked = s.isAutoReplyEnabled;
+      document.getElementById('toggleAwayMode').checked = s.isAwayMode;
+      document.getElementById('toggleGreeting').checked = s.isGreetingEnabled;
+      document.getElementById('defaultReply').value = s.defaultReply || '';
+      document.getElementById('awayMessage').value = s.awayMessage || '';
+      document.getElementById('greetingMessage').value = s.greetingMessage || '';
+    }
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+  }
+}
+
+async function saveSettings() {
+  try {
+    const settingsData = {
+      isAutoReplyEnabled: document.getElementById('toggleAutoReply').checked,
+      isAwayMode: document.getElementById('toggleAwayMode').checked,
+      isGreetingEnabled: document.getElementById('toggleGreeting').checked,
+      defaultReply: document.getElementById('defaultReply').value.trim(),
+      awayMessage: document.getElementById('awayMessage').value.trim(),
+      greetingMessage: document.getElementById('greetingMessage').value.trim()
+    };
+
+    const response = await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settingsData)
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      showToast('Settings saved! ✅', 'success');
+    } else {
+      showToast('Error saving settings', 'error');
+    }
+  } catch (error) {
+    showToast('Error saving settings', 'error');
+    console.error(error);
+  }
 }
