@@ -41,13 +41,25 @@ const userSchema = new mongoose.Schema({
     default: ''
   },
 
-  // Facebook/WhatsApp Page Details
+  // Facebook/WhatsApp Page Details (ADMIN ONLY manages this)
   pageDetails: {
     pageName: { type: String, default: '' },
     pageId: { type: String, default: '' },
     pageAccessToken: { type: String, default: '' },
     whatsappPhoneNumberId: { type: String, default: '' },
     whatsappAccessToken: { type: String, default: '' }
+  },
+
+  // Business Details (Client fills this)
+  businessDetails: {
+    businessName: { type: String, default: '' },
+    category: { type: String, default: '' },
+    description: { type: String, default: '' },
+    address: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    website: { type: String, default: '' },
+    facebookPage: { type: String, default: '' },
+    whatsappNumber: { type: String, default: '' }
   },
 
   // Subscription Plan

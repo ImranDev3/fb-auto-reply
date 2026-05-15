@@ -12,6 +12,7 @@ const axios = require('axios');
 const Rule = require('../models/Rule');
 const Settings = require('../models/Settings');
 const User = require('../models/User');
+const { generateAIReply } = require('./geminiService');
 
 const FB_API_URL = 'https://graph.facebook.com/v18.0/me/messages';
 
@@ -87,8 +88,21 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
       console.log(`✅ [${user?.email || 'global'}] Keyword "${matchedRule.keyword}" matched.`);
       await sendMessage(senderId, matchedRule.reply, accessToken);
     } else if (settings.isAwayMode) {
-      console.log(`🌙 [${user?.email || 'global'}] Away mode - sending default reply.`);
-      await sendMessage(senderId, settings.defaultReply, accessToken);
+      // No keyword matched — try Gemini AI first
+      const businessContext = user?.businessDetails?.businessName 
+        ? `Business: ${user.businessDetails.businessName}. Category: ${user.businessDetails.category || 'General'}. ${user.businessDetails.description || ''}`
+        : '';
+
+      const aiReply = await generateAIReply(messageText, businessContext);
+
+      if (aiReply) {
+        console.log(`🤖 [${user?.email || 'global'}] AI reply generated.`);
+        await sendMessage(senderId, aiReply, accessToken);
+      } else {
+        // Fallback to default reply if AI fails
+        console.log(`🌙 [${user?.email || 'global'}] AI unavailable, sending default reply.`);
+        await sendMessage(senderId, settings.defaultReply, accessToken);
+      }
     } else {
       console.log(`ℹ️ No match, away mode OFF.`);
     }

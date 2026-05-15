@@ -10,6 +10,7 @@
 const axios = require('axios');
 const Rule = require('../models/Rule');
 const Settings = require('../models/Settings');
+const { generateAIReply } = require('./geminiService');
 
 // WhatsApp Cloud API URL
 const WA_API_URL = 'https://graph.facebook.com/v18.0';
@@ -53,9 +54,16 @@ async function handleWhatsAppMessage(phoneNumberId, senderPhone, messageText) {
       console.log(`✅ WhatsApp: Keyword "${matchedRule.keyword}" matched. Sending reply...`);
       await sendWhatsAppMessage(phoneNumberId, senderPhone, matchedRule.reply);
     } else if (settings.isAwayMode) {
-      // No keyword matched but away mode is ON - send default reply
-      console.log(`🌙 WhatsApp: No keyword matched. Away mode ON - sending default reply.`);
-      await sendWhatsAppMessage(phoneNumberId, senderPhone, settings.defaultReply);
+      // Try Gemini AI first
+      const aiReply = await generateAIReply(messageText, '');
+
+      if (aiReply) {
+        console.log(`🤖 WhatsApp: AI reply generated.`);
+        await sendWhatsAppMessage(phoneNumberId, senderPhone, aiReply);
+      } else {
+        console.log(`🌙 WhatsApp: AI unavailable, sending default reply.`);
+        await sendWhatsAppMessage(phoneNumberId, senderPhone, settings.defaultReply);
+      }
     } else {
       console.log(`ℹ️ WhatsApp: No keyword matched and away mode is OFF. No reply sent.`);
     }

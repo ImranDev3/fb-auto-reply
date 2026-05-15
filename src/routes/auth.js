@@ -183,4 +183,29 @@ router.put('/page', protect, async (req, res) => {
   }
 });
 
+// ============ UPDATE BUSINESS DETAILS ============
+router.put('/business', protect, async (req, res) => {
+  try {
+    const { businessName, category, description, address, phone, website, facebookPage, whatsappNumber } = req.body;
+
+    const user = await User.findById(req.user._id);
+
+    if (businessName !== undefined) user.businessDetails.businessName = businessName;
+    if (category !== undefined) user.businessDetails.category = category;
+    if (description !== undefined) user.businessDetails.description = description;
+    if (address !== undefined) user.businessDetails.address = address;
+    if (phone !== undefined) user.businessDetails.phone = phone;
+    if (website !== undefined) user.businessDetails.website = website;
+    if (facebookPage !== undefined) user.businessDetails.facebookPage = facebookPage;
+    if (whatsappNumber !== undefined) user.businessDetails.whatsappNumber = whatsappNumber;
+
+    await user.save();
+
+    res.json({ success: true, data: user.businessDetails });
+  } catch (error) {
+    console.error('Business update error:', error.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;
