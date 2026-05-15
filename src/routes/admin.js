@@ -25,6 +25,34 @@ const { adminOnly } = require('../middleware/admin');
 router.use(protect);
 router.use(adminOnly);
 
+// ============ CREATE USER (Admin creates on behalf) ============
+router.post('/users', async (req, res) => {
+  try {
+    const { name, email, password, plan, maxRules } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Name, email, password required' });
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ success: false, message: 'Email already exists' });
+
+    const limits = { free: 5, starter: 25, pro: 100, enterprise: 99999 };
+    const user = await User.create({
+      name, email, password,
+      subscription: {
+        plan: plan || 'free',
+        maxRules: maxRules || limits[plan] || 5,
+        startDate: new Date(),
+        isActive: true
+      }
+    });
+
+    res.status(201).json({ success: true, data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // ============ GET ALL USERS ============
 router.get('/users', async (req, res) => {
   try {

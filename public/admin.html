@@ -91,7 +91,7 @@
       <!-- Users -->
       <section id="section-users" class="section">
         <div class="card">
-          <div class="card-header"><h2><i class="fas fa-users"></i> All Users</h2></div>
+          <div class="card-header"><h2><i class="fas fa-users"></i> All Users</h2><button class="btn btn-primary" style="padding:8px 16px;font-size:0.82rem;" onclick="openCreateUser()"><i class="fas fa-user-plus"></i> Add User</button></div>
           <div style="padding:16px 24px;">
             <div class="search-bar">
               <input type="text" id="searchInput" placeholder="Search by name or email..." oninput="filterUsers()">
@@ -445,6 +445,29 @@
       await fetch(`/api/admin/coupons/${id}`, { method: 'DELETE', headers: authHeaders() });
       showToast('Coupon deleted', 'success');
       fetchCoupons();
+    }
+
+    // ============ CREATE USER ============
+    function openCreateUser() {
+      const html = prompt('Enter details (format: name,email,password,plan)\nExample: John,john@email.com,pass123,pro');
+      if (!html) return;
+      const parts = html.split(',');
+      if (parts.length < 3) { showToast('Format: name,email,password,plan', 'error'); return; }
+      createNewUser(parts[0].trim(), parts[1].trim(), parts[2].trim(), parts[3]?.trim() || 'free');
+    }
+
+    async function createNewUser(name, email, password, plan) {
+      try {
+        const res = await fetch('/api/admin/users', {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ name, email, password, plan })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('User created!', 'success');
+          fetchUsers(); fetchStats();
+        } else { showToast(data.message, 'error'); }
+      } catch (e) { showToast('Error creating user', 'error'); }
     }
   </script>
 </body>
