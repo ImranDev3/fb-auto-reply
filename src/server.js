@@ -21,6 +21,7 @@ const whatsappRoutes = require('./routes/whatsapp');
 const settingsRoutes = require('./routes/settings');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const productRoutes = require('./routes/products');
 
 // Create Express app
 const app = express();
@@ -95,6 +96,9 @@ app.use('/api/auth', authRoutes);
 
 // Admin API (manage users, subscriptions)
 app.use('/api/admin', adminRoutes);
+
+// Products/Services API
+app.use('/api/products', productRoutes);
 
 // ============ START SERVER ============
 

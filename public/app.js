@@ -55,6 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchRules();
   fetchSettings();
   fetchProfile();
+  fetchProducts();
+  fetchBusinessDetails();
   setupNavigation();
   setupFilterButtons();
 
@@ -82,7 +84,7 @@ function setupNavigation() {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(`section-${section}`).classList.add('active');
 
-      const titles = { dashboard: 'Dashboard', rules: 'Rules', settings: 'Settings', profile: 'Profile' };
+      const titles = { dashboard: 'Dashboard', rules: 'Rules', settings: 'Settings', products: 'Products & Business', profile: 'Profile' };
       document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
 
       document.getElementById('sidebar').classList.remove('open');
@@ -483,4 +485,124 @@ async function checkAdminAccess() {
       if (adminLink) adminLink.style.display = 'flex';
     }
   } catch (e) {}
+}
+
+// ============ PRODUCTS ============
+let editingProductId = null;
+
+document.getElementById('productForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('prodName').value.trim();
+  const price = document.getElementById('prodPrice').value.trim();
+  const category = document.getElementById('prodCategory').value.trim();
+  const description = document.getElementById('prodDesc').value.trim();
+
+  if (!name) { showToast('Product name required', 'error'); return; }
+
+  try {
+    if (editingProductId) {
+      await fetch(`/api/products/${editingProductId}`, {
+        method: 'PUT', headers: authHeaders(),
+        body: JSON.stringify({ name, price, category, description })
+      });
+      showToast('Product updated!', 'success');
+      editingProductId = null;
+      document.getElementById('prodBtnText').textContent = 'Add Product';
+    } else {
+      await fetch('/api/products', {
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ name, price, category, description })
+      });
+      showToast('Product added!', 'success');
+    }
+    document.getElementById('productForm').reset();
+    fetchProducts();
+  } catch (e) { showToast('Error saving product', 'error'); }
+});
+
+async function fetchProducts() {
+  try {
+    const res = await fetch('/api/products', { headers: authHeaders() });
+    const data = await res.json();
+    if (data.success) renderProducts(data.data);
+  } catch (e) {}
+}
+
+function renderProducts(products) {
+  const container = document.getElementById('productsContainer');
+  if (!products.length) {
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>No products yet. Add your first product above!</p></div>';
+    return;
+  }
+  container.innerHTML = products.map(p => `
+    <div class="rule-item">
+      <div class="rule-info">
+        <div class="rule-keyword"><i class="fas fa-box" style="color:var(--primary);font-size:0.8rem;"></i> ${escapeHtml(p.name)} ${p.price ? `<span style="color:var(--success);font-weight:700;margin-left:8px;">${escapeHtml(p.price)}</span>` : ''}</div>
+        <div class="rule-reply">${escapeHtml(p.description || 'No description')}</div>
+        <div class="rule-meta">
+          <span class="badge badge-both">${escapeHtml(p.category || 'General')}</span>
+          <span class="badge ${p.isAvailable ? 'badge-active' : 'badge-inactive'}">${p.isAvailable ? 'Available' : 'Unavailable'}</span>
+        </div>
+      </div>
+      <div class="rule-actions">
+        <button class="btn btn-edit" onclick="editProduct('${p._id}','${escapeAttr(p.name)}','${escapeAttr(p.price||'')}','${escapeAttr(p.category||'')}','${escapeAttr(p.description||'')}')"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-danger" onclick="deleteProduct('${p._id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editProduct(id, name, price, category, desc) {
+  editingProductId = id;
+  document.getElementById('prodName').value = name;
+  document.getElementById('prodPrice').value = price;
+  document.getElementById('prodCategory').value = category;
+  document.getElementById('prodDesc').value = desc;
+  document.getElementById('prodBtnText').textContent = 'Update Product';
+  document.querySelector('[data-section="products"]').click();
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  await fetch(`/api/products/${id}`, { method: 'DELETE', headers: authHeaders() });
+  showToast('Product deleted', 'success');
+  fetchProducts();
+}
+
+// ============ BUSINESS DETAILS ============
+async function fetchBusinessDetails() {
+  try {
+    const res = await fetch('/api/auth/me', { headers: authHeaders() });
+    const data = await res.json();
+    if (data.success && data.data.businessDetails) {
+      const b = data.data.businessDetails;
+      document.getElementById('bizName').value = b.businessName || '';
+      document.getElementById('bizCategory').value = b.category || '';
+      document.getElementById('bizDesc').value = b.description || '';
+      document.getElementById('bizAddress').value = b.address || '';
+      document.getElementById('bizPhone').value = b.phone || '';
+      document.getElementById('bizWebsite').value = b.website || '';
+      document.getElementById('bizWhatsapp').value = b.whatsappNumber || '';
+    }
+  } catch (e) {}
+}
+
+async function saveBusinessDetails() {
+  try {
+    const res = await fetch('/api/auth/business', {
+      method: 'PUT', headers: authHeaders(),
+      body: JSON.stringify({
+        businessName: document.getElementById('bizName').value.trim(),
+        category: document.getElementById('bizCategory').value.trim(),
+        description: document.getElementById('bizDesc').value.trim(),
+        address: document.getElementById('bizAddress').value.trim(),
+        phone: document.getElementById('bizPhone').value.trim(),
+        website: document.getElementById('bizWebsite').value.trim(),
+        whatsappNumber: document.getElementById('bizWhatsapp').value.trim()
+      })
+    });
+    const data = await res.json();
+    if (data.success) showToast('Business details saved!', 'success');
+    else showToast('Error saving', 'error');
+  } catch (e) { showToast('Error saving', 'error'); }
 }

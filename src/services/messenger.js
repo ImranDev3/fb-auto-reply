@@ -12,6 +12,7 @@ const axios = require('axios');
 const Rule = require('../models/Rule');
 const Settings = require('../models/Settings');
 const User = require('../models/User');
+const Product = require('../models/Product');
 const { generateAIReply } = require('./geminiService');
 
 const FB_API_URL = 'https://graph.facebook.com/v18.0/me/messages';
@@ -89,9 +90,30 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
       await sendMessage(senderId, matchedRule.reply, accessToken);
     } else if (settings.isAwayMode) {
       // No keyword matched — try Gemini AI first
-      const businessContext = user?.businessDetails?.businessName 
-        ? `Business: ${user.businessDetails.businessName}. Category: ${user.businessDetails.category || 'General'}. ${user.businessDetails.description || ''}`
-        : '';
+      // Build business context from user's business details + products
+      let businessContext = '';
+      
+      if (user) {
+        const bd = user.businessDetails || {};
+        if (bd.businessName) businessContext += `Business: ${bd.businessName}. `;
+        if (bd.category) businessContext += `Category: ${bd.category}. `;
+        if (bd.description) businessContext += `About: ${bd.description}. `;
+        if (bd.address) businessContext += `Address: ${bd.address}. `;
+        if (bd.phone) businessContext += `Phone: ${bd.phone}. `;
+        if (bd.website) businessContext += `Website: ${bd.website}. `;
+
+        // Get user's products/services
+        const products = await Product.find({ userId: user._id, isAvailable: true });
+        if (products.length > 0) {
+          businessContext += '\n\nProducts/Services available:\n';
+          products.forEach(p => {
+            businessContext += `- ${p.name}`;
+            if (p.price) businessContext += ` (Price: ${p.price})`;
+            if (p.description) businessContext += ` - ${p.description}`;
+            businessContext += '\n';
+          });
+        }
+      }
 
       const aiReply = await generateAIReply(messageText, businessContext);
 
