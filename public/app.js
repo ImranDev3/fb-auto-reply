@@ -75,7 +75,7 @@ function logout() {
 
 // ============ NAVIGATION ============
 function setupNavigation() {
-  document.querySelectorAll('.nav-item').forEach(item => {
+  document.querySelectorAll('.nav-item[data-section]').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const section = item.dataset.section;
