@@ -15,7 +15,7 @@ const settingsSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false
   },
   // Default reply when no keyword matches
   defaultReply: {
