@@ -24,6 +24,12 @@ const ruleSchema = new mongoose.Schema({
     required: [true, 'Reply message is required'],
     trim: true
   },
+  // Which platform this rule applies to (both, messenger, whatsapp)
+  platform: {
+    type: String,
+    enum: ['both', 'messenger', 'whatsapp'],
+    default: 'both'
+  },
   // Toggle rule on/off without deleting
   isActive: {
     type: Boolean,

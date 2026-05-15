@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 // ============ CREATE A NEW RULE ============
 router.post('/', async (req, res) => {
   try {
-    const { keyword, reply } = req.body;
+    const { keyword, reply, platform } = req.body;
 
     // Validate input
     if (!keyword || !reply) {
@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
     }
 
     // Create and save the rule
-    const rule = await Rule.create({ keyword, reply });
+    const rule = await Rule.create({ keyword, reply, platform: platform || 'both' });
     res.status(201).json({ success: true, data: rule });
   } catch (error) {
     console.error('Error creating rule:', error.message);
@@ -49,11 +49,11 @@ router.post('/', async (req, res) => {
 // ============ UPDATE A RULE ============
 router.put('/:id', async (req, res) => {
   try {
-    const { keyword, reply, isActive } = req.body;
+    const { keyword, reply, isActive, platform } = req.body;
 
     const rule = await Rule.findByIdAndUpdate(
       req.params.id,
-      { keyword, reply, isActive },
+      { keyword, reply, isActive, platform },
       { new: true, runValidators: true }
     );
 

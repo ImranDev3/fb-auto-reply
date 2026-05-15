@@ -17,6 +17,7 @@ const connectDB = require('./config/db');
 // Import route files
 const webhookRoutes = require('./routes/webhook');
 const rulesRoutes = require('./routes/rules');
+const whatsappRoutes = require('./routes/whatsapp');
 
 // Create Express app
 const app = express();
@@ -36,6 +37,9 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Facebook Webhook routes (verification + message receiving)
 app.use('/webhook', webhookRoutes);
+
+// WhatsApp Webhook routes
+app.use('/whatsapp', whatsappRoutes);
 
 // Auto-reply rules CRUD API
 app.use('/api/rules', rulesRoutes);
