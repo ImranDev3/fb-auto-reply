@@ -18,7 +18,7 @@ const token = localStorage.getItem('token');
 const user = JSON.parse(localStorage.getItem('user') || 'null');
 
 if (!token) {
-  window.location.href = '/login.html';
+  window.location.href = '/login';
 }
 
 // Auth headers for all API calls

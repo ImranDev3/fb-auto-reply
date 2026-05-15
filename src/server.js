@@ -32,6 +32,23 @@ app.use(express.json());
 // Enable CORS (allows frontend to talk to backend)
 app.use(cors());
 
+// ============ PAGE ROUTES (before static) ============
+
+// Landing page at root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'landing.html'));
+});
+
+// Login page
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
+});
+
+// Dashboard (protected by frontend auth check)
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
+
 // Serve static frontend files from 'public' folder
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -51,16 +68,6 @@ app.use('/api/settings', settingsRoutes);
 
 // Auth API (register, login, profile)
 app.use('/api/auth', authRoutes);
-
-// Serve the landing page at root URL (marketing page)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'landing.html'));
-});
-
-// Serve dashboard (protected by frontend auth check)
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
-});
 
 // ============ START SERVER ============
 
