@@ -49,6 +49,19 @@ app.get('/how-to-use', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'how-to-use.html'));
 });
 
+// Legal pages
+app.get('/privacy-policy', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'privacy-policy.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'terms.html'));
+});
+
+app.get('/refund-policy', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'refund-policy.html'));
+});
+
 // Dashboard (protected by frontend auth check)
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
