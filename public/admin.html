@@ -7,54 +7,59 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    .user-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-    .user-card:hover { border-color: var(--primary-light); }
+    .user-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 14px; transition: all 0.2s; }
+    .user-card:hover { border-color: var(--primary-light); box-shadow: 0 4px 12px rgba(79,70,229,0.08); }
+    .user-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
     .user-left { display: flex; align-items: center; gap: 14px; }
     .user-avatar-lg { width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem; }
     .user-name { font-weight: 700; font-size: 0.95rem; }
     .user-email { color: var(--gray); font-size: 0.82rem; }
-    .user-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .plan-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .user-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .user-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .detail-item { font-size: 0.82rem; color: var(--gray); }
+    .detail-item strong { display: block; color: var(--dark); font-size: 0.88rem; margin-top: 2px; }
+    .user-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .plan-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
     .plan-free { background: #f1f5f9; color: #64748b; }
     .plan-starter { background: #eff6ff; color: #2563eb; }
     .plan-pro { background: #f5f3ff; color: #7c3aed; }
     .plan-enterprise { background: #fef3c7; color: #d97706; }
-    .status-active { color: #10b981; }
-    .status-inactive { color: #ef4444; }
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; align-items: center; justify-content: center; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+    .status-active { background: #ecfdf5; color: #059669; }
+    .status-inactive { background: #fef2f2; color: #dc2626; }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.show { display: flex; }
-    .modal { background: white; border-radius: 16px; padding: 32px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
-    .modal h2 { margin-bottom: 20px; font-size: 1.2rem; }
+    .modal { background: white; border-radius: 16px; padding: 32px; width: 100%; max-width: 550px; max-height: 85vh; overflow-y: auto; }
+    .modal h2 { margin-bottom: 20px; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+    .modal h2 i { color: var(--primary); }
     .modal .form-group { margin-bottom: 14px; }
-    .modal .form-group label { font-size: 0.85rem; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .modal .form-group label { font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; display: block; }
+    .modal .form-group input, .modal .form-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+    .modal .form-group input:focus, .modal .form-group select:focus { border-color: var(--primary); outline: none; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .search-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .search-bar input { flex: 1; min-width: 200px; padding: 10px 16px; border: 2px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+    .search-bar select { padding: 10px 14px; border: 2px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="brand-icon"><i class="fas fa-shield-halved"></i></div>
       <span class="brand-text">Admin Panel</span>
     </div>
     <nav class="sidebar-nav">
-      <a href="#" class="nav-item active" data-section="overview">
-        <i class="fas fa-chart-pie"></i><span>Overview</span>
-      </a>
-      <a href="#" class="nav-item" data-section="users">
-        <i class="fas fa-users"></i><span>All Users</span>
-      </a>
-      <a href="/dashboard" class="nav-item">
-        <i class="fas fa-arrow-left"></i><span>Back to Dashboard</span>
-      </a>
+      <a href="#" class="nav-item active" data-section="overview"><i class="fas fa-chart-pie"></i><span>Overview</span></a>
+      <a href="#" class="nav-item" data-section="users"><i class="fas fa-users"></i><span>All Users</span></a>
+      <a href="/dashboard" class="nav-item"><i class="fas fa-desktop"></i><span>My Dashboard</span></a>
+      <a href="/" class="nav-item"><i class="fas fa-globe"></i><span>View Site</span></a>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   </aside>
 
-  <!-- Main -->
   <div class="main-wrapper">
     <header class="topbar">
       <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
@@ -66,36 +71,18 @@
       <!-- Overview -->
       <section id="section-overview" class="section active">
         <div class="stats-grid">
-          <div class="stat-card stat-blue">
-            <div class="stat-icon"><i class="fas fa-users"></i></div>
-            <div class="stat-info"><span class="stat-number" id="statTotalUsers">0</span><span class="stat-label">Total Users</span></div>
-          </div>
-          <div class="stat-card stat-green">
-            <div class="stat-icon"><i class="fas fa-user-check"></i></div>
-            <div class="stat-info"><span class="stat-number" id="statActiveUsers">0</span><span class="stat-label">Active Users</span></div>
-          </div>
-          <div class="stat-card stat-purple">
-            <div class="stat-icon"><i class="fas fa-list"></i></div>
-            <div class="stat-info"><span class="stat-number" id="statTotalRules">0</span><span class="stat-label">Total Rules</span></div>
-          </div>
-          <div class="stat-card stat-whatsapp">
-            <div class="stat-icon"><i class="fas fa-crown"></i></div>
-            <div class="stat-info"><span class="stat-number" id="statProUsers">0</span><span class="stat-label">Pro Users</span></div>
-          </div>
+          <div class="stat-card stat-blue"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-info"><span class="stat-number" id="statTotalUsers">0</span><span class="stat-label">Total Users</span></div></div>
+          <div class="stat-card stat-green"><div class="stat-icon"><i class="fas fa-user-check"></i></div><div class="stat-info"><span class="stat-number" id="statActiveUsers">0</span><span class="stat-label">Active Users</span></div></div>
+          <div class="stat-card stat-purple"><div class="stat-icon"><i class="fas fa-list"></i></div><div class="stat-info"><span class="stat-number" id="statTotalRules">0</span><span class="stat-label">Total Rules</span></div></div>
+          <div class="stat-card stat-whatsapp"><div class="stat-icon"><i class="fas fa-crown"></i></div><div class="stat-info"><span class="stat-number" id="statPaidUsers">0</span><span class="stat-label">Paid Users</span></div></div>
         </div>
-
         <div class="card">
-          <div class="card-header"><h2><i class="fas fa-chart-bar"></i> Subscription Breakdown</h2></div>
-          <div style="padding: 24px;">
-            <div class="rule-item" style="border: none; padding: 10px 0;">
-              <span>🆓 Free Plan</span><strong id="statFreeUsers">0</strong>
-            </div>
-            <div class="rule-item" style="border: none; padding: 10px 0;">
-              <span>🔵 Pro Plan</span><strong id="statProUsers2">0</strong>
-            </div>
-            <div class="rule-item" style="border: none; padding: 10px 0;">
-              <span>🟣 Enterprise Plan</span><strong id="statEnterpriseUsers">0</strong>
-            </div>
+          <div class="card-header"><h2><i class="fas fa-chart-bar"></i> Plans Breakdown</h2></div>
+          <div style="padding:24px;">
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span>🆓 Free</span><strong id="statFree">0</strong></div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span>⭐ Starter</span><strong id="statStarter">0</strong></div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span>🔵 Pro</span><strong id="statPro">0</strong></div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;"><span>🟣 Enterprise</span><strong id="statEnterprise">0</strong></div>
           </div>
         </div>
       </section>
@@ -104,55 +91,65 @@
       <section id="section-users" class="section">
         <div class="card">
           <div class="card-header"><h2><i class="fas fa-users"></i> All Users</h2></div>
-          <div id="usersContainer" style="padding: 16px 24px;">
-            <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading users...</div>
+          <div style="padding:16px 24px;">
+            <div class="search-bar">
+              <input type="text" id="searchInput" placeholder="Search by name or email..." oninput="filterUsers()">
+              <select id="filterPlan" onchange="filterUsers()">
+                <option value="all">All Plans</option>
+                <option value="free">Free</option>
+                <option value="starter">Starter</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+              <select id="filterStatus" onchange="filterUsers()">
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Suspended</option>
+              </select>
+            </div>
+            <div id="usersContainer"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>
           </div>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- Edit User Modal -->
+  <!-- Edit Modal -->
   <div class="modal-overlay" id="editModal">
     <div class="modal">
-      <h2><i class="fas fa-user-edit"></i> Edit User</h2>
-      <div class="form-group">
-        <label>Name</label>
-        <input type="text" id="editName">
+      <h2><i class="fas fa-user-edit"></i> Manage User</h2>
+      <div class="form-group"><label>Name</label><input type="text" id="editName"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="editEmail"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label>Plan</label>
+          <select id="editPlan" onchange="updateMaxRules()">
+            <option value="free">Free</option>
+            <option value="starter">Starter</option>
+            <option value="pro">Pro</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Max Rules</label><input type="number" id="editMaxRules" value="5"></div>
       </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="editEmail">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label>Status</label>
+          <select id="editStatus"><option value="true">Active</option><option value="false">Suspended</option></select>
+        </div>
+        <div class="form-group"><label>Role</label>
+          <select id="editRole"><option value="user">User</option><option value="admin">Admin</option></select>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Subscription Plan</label>
-        <select id="editPlan">
-          <option value="free">Free (5 rules)</option>
-          <option value="starter">Starter (25 rules)</option>
-          <option value="pro">Pro (100 rules)</option>
-          <option value="enterprise">Enterprise (Unlimited)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Max Rules</label>
-        <input type="number" id="editMaxRules" value="5">
-      </div>
-      <div class="form-group">
-        <label>Account Status</label>
-        <select id="editStatus">
-          <option value="true">Active</option>
-          <option value="false">Suspended</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Role</label>
-        <select id="editRole">
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
+      <hr style="margin:16px 0;border:none;border-top:1px solid var(--border);">
+      <h3 style="font-size:0.95rem;margin-bottom:12px;"><i class="fas fa-link" style="color:var(--primary);"></i> Page Details</h3>
+      <div class="form-group"><label>Page Name</label><input type="text" id="editPageName"></div>
+      <div class="form-group"><label>Page ID</label><input type="text" id="editPageId"></div>
+      <div class="form-group"><label>Page Access Token</label><input type="text" id="editPageToken"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label>WhatsApp Phone ID</label><input type="text" id="editWaPhone"></div>
+        <div class="form-group"><label>WhatsApp Token</label><input type="text" id="editWaToken"></div>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-primary" onclick="saveUserEdit()"><i class="fas fa-save"></i> Save</button>
+        <button class="btn btn-primary" onclick="saveUser()"><i class="fas fa-save"></i> Save Changes</button>
         <button class="btn" style="background:#e2e8f0;" onclick="closeModal()">Cancel</button>
       </div>
     </div>
@@ -162,31 +159,24 @@
 
   <script>
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
     if (!token) window.location.href = '/login';
+    function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }; }
 
-    function authHeaders() {
-      return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-    }
-
+    let allUsers = [];
     let editingUserId = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchStats();
-      fetchUsers();
-      setupNav();
-    });
+    document.addEventListener('DOMContentLoaded', () => { fetchStats(); fetchUsers(); setupNav(); });
 
     function setupNav() {
       document.querySelectorAll('.nav-item[data-section]').forEach(item => {
         item.addEventListener('click', (e) => {
           e.preventDefault();
-          const section = item.dataset.section;
+          const s = item.dataset.section;
           document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
           item.classList.add('active');
-          document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-          document.getElementById(`section-${section}`).classList.add('active');
-          document.getElementById('pageTitle').textContent = section === 'overview' ? 'Admin Overview' : 'All Users';
+          document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+          document.getElementById(`section-${s}`).classList.add('active');
+          document.getElementById('pageTitle').textContent = s === 'overview' ? 'Admin Overview' : 'All Users';
         });
       });
     }
@@ -195,80 +185,101 @@
     function logout() { localStorage.clear(); window.location.href = '/login'; }
 
     async function fetchStats() {
-      try {
-        const res = await fetch('/api/admin/stats', { headers: authHeaders() });
-        const data = await res.json();
-        if (data.success) {
-          document.getElementById('statTotalUsers').textContent = data.data.totalUsers;
-          document.getElementById('statActiveUsers').textContent = data.data.activeUsers;
-          document.getElementById('statTotalRules').textContent = data.data.totalRules;
-          document.getElementById('statProUsers').textContent = data.data.proUsers + data.data.enterpriseUsers;
-          document.getElementById('statFreeUsers').textContent = data.data.freeUsers;
-          document.getElementById('statProUsers2').textContent = data.data.proUsers;
-          document.getElementById('statEnterpriseUsers').textContent = data.data.enterpriseUsers;
-        }
-      } catch (e) { console.error(e); }
+      const res = await fetch('/api/admin/stats', { headers: authHeaders() });
+      const data = await res.json();
+      if (data.success) {
+        const d = data.data;
+        document.getElementById('statTotalUsers').textContent = d.totalUsers;
+        document.getElementById('statActiveUsers').textContent = d.activeUsers;
+        document.getElementById('statTotalRules').textContent = d.totalRules;
+        document.getElementById('statPaidUsers').textContent = d.proUsers + d.enterpriseUsers;
+        document.getElementById('statFree').textContent = d.freeUsers;
+        document.getElementById('statStarter').textContent = 0;
+        document.getElementById('statPro').textContent = d.proUsers;
+        document.getElementById('statEnterprise').textContent = d.enterpriseUsers;
+      }
     }
 
     async function fetchUsers() {
-      try {
-        const res = await fetch('/api/admin/users', { headers: authHeaders() });
-        const data = await res.json();
-        if (data.success) renderUsers(data.data);
-        else document.getElementById('usersContainer').innerHTML = '<p>Access denied. Admin only.</p>';
-      } catch (e) {
-        document.getElementById('usersContainer').innerHTML = '<p>Error loading users.</p>';
-      }
+      const res = await fetch('/api/admin/users', { headers: authHeaders() });
+      const data = await res.json();
+      if (data.success) { allUsers = data.data; renderUsers(allUsers); }
+      else document.getElementById('usersContainer').innerHTML = '<p style="color:var(--danger);">Admin access required.</p>';
+    }
+
+    function filterUsers() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const plan = document.getElementById('filterPlan').value;
+      const status = document.getElementById('filterStatus').value;
+      let filtered = allUsers;
+      if (search) filtered = filtered.filter(u => u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search));
+      if (plan !== 'all') filtered = filtered.filter(u => (u.subscription?.plan || 'free') === plan);
+      if (status === 'active') filtered = filtered.filter(u => u.isActive);
+      if (status === 'inactive') filtered = filtered.filter(u => !u.isActive);
+      renderUsers(filtered);
     }
 
     function renderUsers(users) {
-      if (users.length === 0) {
-        document.getElementById('usersContainer').innerHTML = '<p>No users yet.</p>';
-        return;
-      }
+      if (!users.length) { document.getElementById('usersContainer').innerHTML = '<div class="empty-state"><p>No users found.</p></div>'; return; }
       document.getElementById('usersContainer').innerHTML = users.map(u => `
         <div class="user-card">
-          <div class="user-left">
-            <div class="user-avatar-lg">${u.name.charAt(0).toUpperCase()}</div>
-            <div>
-              <div class="user-name">${u.name} ${u.role === 'admin' ? '<i class="fas fa-shield-halved" style="color:#d97706;font-size:0.8rem;"></i>' : ''}</div>
-              <div class="user-email">${u.email}</div>
-              <div style="font-size:0.78rem;color:#94a3b8;">Rules: ${u.ruleCount || 0} | Page: ${u.pageDetails?.pageName || 'Not connected'}</div>
+          <div class="user-top">
+            <div class="user-left">
+              <div class="user-avatar-lg">${u.name.charAt(0).toUpperCase()}</div>
+              <div>
+                <div class="user-name">${u.name} ${u.role === 'admin' ? '<i class="fas fa-shield-halved" style="color:#d97706;font-size:0.75rem;"></i>' : ''}</div>
+                <div class="user-email">${u.email}</div>
+              </div>
+            </div>
+            <div class="user-badges">
+              <span class="plan-badge plan-${u.subscription?.plan || 'free'}">${u.subscription?.plan || 'free'}</span>
+              <span class="status-badge ${u.isActive ? 'status-active' : 'status-inactive'}">${u.isActive ? '● Active' : '● Suspended'}</span>
             </div>
           </div>
-          <div class="user-right">
-            <span class="plan-badge plan-${u.subscription?.plan || 'free'}">${u.subscription?.plan || 'free'}</span>
-            <span class="${u.isActive ? 'status-active' : 'status-inactive'}"><i class="fas fa-circle" style="font-size:0.5rem;"></i> ${u.isActive ? 'Active' : 'Suspended'}</span>
-            <button class="btn btn-edit" onclick="openEditModal('${u._id}', '${u.name}', '${u.email}', '${u.subscription?.plan || 'free'}', ${u.subscription?.maxRules || 5}, ${u.isActive}, '${u.role || 'user'}')"><i class="fas fa-pen"></i></button>
-            <button class="btn btn-danger" onclick="deleteUser('${u._id}')"><i class="fas fa-trash"></i></button>
+          <div class="user-details-grid">
+            <div class="detail-item">Rules<strong>${u.ruleCount || 0} / ${u.subscription?.maxRules || 5}</strong></div>
+            <div class="detail-item">Page<strong>${u.pageDetails?.pageName || '❌ Not connected'}</strong></div>
+            <div class="detail-item">Joined<strong>${new Date(u.createdAt).toLocaleDateString()}</strong></div>
+            <div class="detail-item">Last Login<strong>${u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never'}</strong></div>
+          </div>
+          <div class="user-actions">
+            <button class="btn btn-edit" onclick='openEdit(${JSON.stringify(u).replace(/'/g,"&#39;")})'><i class="fas fa-pen"></i> Edit</button>
+            <button class="btn btn-primary" style="padding:8px 14px;font-size:0.8rem;" onclick="upgradeToPro('${u._id}')"><i class="fas fa-crown"></i> Upgrade Pro</button>
+            <button class="btn btn-danger" onclick="deleteUser('${u._id}')"><i class="fas fa-trash"></i> Delete</button>
           </div>
         </div>
       `).join('');
     }
 
-    function openEditModal(id, name, email, plan, maxRules, isActive, role) {
-      editingUserId = id;
-      document.getElementById('editName').value = name;
-      document.getElementById('editEmail').value = email;
-      document.getElementById('editPlan').value = plan;
-      document.getElementById('editMaxRules').value = maxRules;
-      document.getElementById('editStatus').value = String(isActive);
-      document.getElementById('editRole').value = role;
+    function openEdit(u) {
+      editingUserId = u._id;
+      document.getElementById('editName').value = u.name || '';
+      document.getElementById('editEmail').value = u.email || '';
+      document.getElementById('editPlan').value = u.subscription?.plan || 'free';
+      document.getElementById('editMaxRules').value = u.subscription?.maxRules || 5;
+      document.getElementById('editStatus').value = String(u.isActive);
+      document.getElementById('editRole').value = u.role || 'user';
+      document.getElementById('editPageName').value = u.pageDetails?.pageName || '';
+      document.getElementById('editPageId').value = u.pageDetails?.pageId || '';
+      document.getElementById('editPageToken').value = u.pageDetails?.pageAccessToken || '';
+      document.getElementById('editWaPhone').value = u.pageDetails?.whatsappPhoneNumberId || '';
+      document.getElementById('editWaToken').value = u.pageDetails?.whatsappAccessToken || '';
       document.getElementById('editModal').classList.add('show');
     }
 
-    function closeModal() {
-      document.getElementById('editModal').classList.remove('show');
-      editingUserId = null;
+    function closeModal() { document.getElementById('editModal').classList.remove('show'); }
+
+    function updateMaxRules() {
+      const plan = document.getElementById('editPlan').value;
+      const limits = { free: 5, starter: 25, pro: 100, enterprise: 99999 };
+      document.getElementById('editMaxRules').value = limits[plan] || 5;
     }
 
-    async function saveUserEdit() {
+    async function saveUser() {
       if (!editingUserId) return;
       try {
-        // Update user info
         await fetch(`/api/admin/users/${editingUserId}`, {
-          method: 'PUT',
-          headers: authHeaders(),
+          method: 'PUT', headers: authHeaders(),
           body: JSON.stringify({
             name: document.getElementById('editName').value,
             email: document.getElementById('editEmail').value,
@@ -276,41 +287,52 @@
             role: document.getElementById('editRole').value
           })
         });
-
-        // Update subscription
-        const plan = document.getElementById('editPlan').value;
-        const maxRules = parseInt(document.getElementById('editMaxRules').value);
         await fetch(`/api/admin/users/${editingUserId}/subscription`, {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ plan, maxRules, isActive: true })
+          method: 'PUT', headers: authHeaders(),
+          body: JSON.stringify({
+            plan: document.getElementById('editPlan').value,
+            maxRules: parseInt(document.getElementById('editMaxRules').value),
+            isActive: true
+          })
         });
-
+        // Update page details via admin
+        await fetch(`/api/admin/users/${editingUserId}/page`, {
+          method: 'PUT', headers: authHeaders(),
+          body: JSON.stringify({
+            pageName: document.getElementById('editPageName').value,
+            pageId: document.getElementById('editPageId').value,
+            pageAccessToken: document.getElementById('editPageToken').value,
+            whatsappPhoneNumberId: document.getElementById('editWaPhone').value,
+            whatsappAccessToken: document.getElementById('editWaToken').value
+          })
+        });
         showToast('User updated!', 'success');
-        closeModal();
-        fetchUsers();
-        fetchStats();
-      } catch (e) {
-        showToast('Error updating user', 'error');
-      }
+        closeModal(); fetchUsers(); fetchStats();
+      } catch (e) { showToast('Error saving', 'error'); }
+    }
+
+    async function upgradeToPro(id) {
+      if (!confirm('Upgrade this user to Pro plan (100 rules)?')) return;
+      await fetch(`/api/admin/users/${id}/subscription`, {
+        method: 'PUT', headers: authHeaders(),
+        body: JSON.stringify({ plan: 'pro', maxRules: 100, isActive: true })
+      });
+      showToast('Upgraded to Pro!', 'success');
+      fetchUsers(); fetchStats();
     }
 
     async function deleteUser(id) {
-      if (!confirm('Delete this user and ALL their data? This cannot be undone.')) return;
-      try {
-        await fetch(`/api/admin/users/${id}`, { method: 'DELETE', headers: authHeaders() });
-        showToast('User deleted', 'success');
-        fetchUsers();
-        fetchStats();
-      } catch (e) { showToast('Error', 'error'); }
+      if (!confirm('DELETE this user and ALL their data? Cannot undo!')) return;
+      await fetch(`/api/admin/users/${id}`, { method: 'DELETE', headers: authHeaders() });
+      showToast('User deleted', 'success');
+      fetchUsers(); fetchStats();
     }
 
     function showToast(msg, type) {
-      const c = document.getElementById('toastContainer');
       const t = document.createElement('div');
       t.className = `toast toast-${type}`;
-      t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
-      c.appendChild(t);
+      t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
+      document.getElementById('toastContainer').appendChild(t);
       setTimeout(() => t.remove(), 3000);
     }
   </script>

@@ -98,6 +98,26 @@ router.put('/users/:id/subscription', async (req, res) => {
   }
 });
 
+// ============ UPDATE USER PAGE DETAILS (Admin) ============
+router.put('/users/:id/page', async (req, res) => {
+  try {
+    const { pageName, pageId, pageAccessToken, whatsappPhoneNumberId, whatsappAccessToken } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    if (pageName !== undefined) user.pageDetails.pageName = pageName;
+    if (pageId !== undefined) user.pageDetails.pageId = pageId;
+    if (pageAccessToken !== undefined) user.pageDetails.pageAccessToken = pageAccessToken;
+    if (whatsappPhoneNumberId !== undefined) user.pageDetails.whatsappPhoneNumberId = whatsappPhoneNumberId;
+    if (whatsappAccessToken !== undefined) user.pageDetails.whatsappAccessToken = whatsappAccessToken;
+
+    await user.save();
+    res.json({ success: true, data: user.pageDetails });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // ============ DELETE USER ============
 router.delete('/users/:id', async (req, res) => {
   try {

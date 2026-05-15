@@ -208,33 +208,42 @@
 
         <!-- Page Details -->
         <div class="card">
-          <div class="card-header"><h2><i class="fab fa-facebook"></i> Page & API Details</h2></div>
+          <div class="card-header"><h2><i class="fab fa-facebook"></i> Connect Your Page</h2></div>
           <div class="rule-form">
+            <div class="info-banner" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px;margin-bottom:20px;">
+              <p style="margin:0;font-size:0.88rem;color:#1e40af;"><strong><i class="fas fa-info-circle"></i> How to get your Page Access Token:</strong></p>
+              <ol style="margin:8px 0 0;padding-left:20px;font-size:0.84rem;color:#1e40af;">
+                <li>Go to <a href="https://developers.facebook.com/apps" target="_blank" style="color:#4f46e5;">developers.facebook.com</a></li>
+                <li>Open your App → Messenger → Settings</li>
+                <li>Under "Generate access tokens" click "Generate"</li>
+                <li>Copy the token and paste below</li>
+              </ol>
+            </div>
             <div class="form-row">
               <div class="form-group">
                 <label><i class="fas fa-file"></i> Page Name</label>
-                <input type="text" id="pageName" placeholder="Your Facebook Page name">
+                <input type="text" id="pageName" placeholder="e.g. My Business Page">
               </div>
               <div class="form-group">
                 <label><i class="fas fa-id-badge"></i> Page ID</label>
-                <input type="text" id="pageId" placeholder="Facebook Page ID">
+                <input type="text" id="pageId" placeholder="e.g. 1070556922813267">
               </div>
             </div>
             <div class="form-group">
               <label><i class="fas fa-key"></i> Page Access Token</label>
-              <input type="password" id="pageToken" placeholder="Facebook Page Access Token">
+              <input type="password" id="pageToken" placeholder="Paste your Page Access Token here">
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label><i class="fab fa-whatsapp"></i> WhatsApp Phone Number ID</label>
-                <input type="text" id="waPhoneId" placeholder="WhatsApp Phone Number ID">
+                <label><i class="fab fa-whatsapp"></i> WhatsApp Phone Number ID <span style="color:var(--gray);font-weight:400;">(Pro only)</span></label>
+                <input type="text" id="waPhoneId" placeholder="Optional - for WhatsApp">
               </div>
               <div class="form-group">
                 <label><i class="fas fa-key"></i> WhatsApp Access Token</label>
-                <input type="password" id="waToken" placeholder="WhatsApp Access Token">
+                <input type="password" id="waToken" placeholder="Optional - for WhatsApp">
               </div>
             </div>
-            <button class="btn btn-primary" onclick="savePageDetails()"><i class="fas fa-save"></i> Save Page Details</button>
+            <button class="btn btn-primary" onclick="savePageDetails()"><i class="fas fa-plug"></i> Connect Page</button>
           </div>
         </div>
 
