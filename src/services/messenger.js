@@ -19,25 +19,35 @@ const FB_API_URL = 'https://graph.facebook.com/v18.0/me/messages';
 
 /**
  * Handle incoming message - multi-tenant
+ * Works for ALL clients - finds user by page ID and uses their data
  */
 async function handleIncomingMessage(senderId, messageText, recipientId) {
   try {
+    console.log(`📩 Message from ${senderId} to page ${recipientId}: "${messageText}"`);
+
     // Find the user who owns this page (recipientId = page ID)
     let user = null;
     let accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
 
+    // Try to find user by pageId
     if (recipientId) {
-      user = await User.findOne({ 'pageDetails.pageId': recipientId, isActive: true });
+      user = await User.findOne({ 'pageDetails.pageId': String(recipientId), isActive: true });
     }
 
-    // If no user found by pageId, try to find any user with a token
+    // If not found by pageId, try by pageAccessToken (for users who haven't set pageId)
     if (!user) {
-      user = await User.findOne({ 'pageDetails.pageAccessToken': { $ne: '' }, isActive: true });
+      // Find any active user with a page token (fallback for single-user setup)
+      user = await User.findOne({ 
+        'pageDetails.pageAccessToken': { $exists: true, $ne: '' }, 
+        isActive: true 
+      }).sort({ lastLogin: -1 });
     }
 
-    // Use user's token if available
-    if (user && user.pageDetails && user.pageDetails.pageAccessToken) {
-      accessToken = user.pageDetails.pageAccessToken;
+    if (user) {
+      console.log(`👤 Matched user: ${user.email} (${user.businessDetails?.businessName || 'No business name'})`);
+      accessToken = user.pageDetails.pageAccessToken || process.env.FB_PAGE_ACCESS_TOKEN;
+    } else {
+      console.log(`⚠️ No user found for page ${recipientId}. Using global token.`);
     }
 
     // Check subscription is active
@@ -47,32 +57,35 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
     }
 
     // Get user-specific settings
-    let settings;
+    let settings = null;
     if (user) {
       settings = await Settings.findOne({ userId: user._id });
     }
     if (!settings) {
-      settings = await Settings.findOne({ userId: { $exists: false } });
-    }
-    if (!settings) {
-      settings = { isAutoReplyEnabled: true, isAwayMode: true, defaultReply: 'Thanks for your message! We will get back to you soon.' };
+      // Create default settings
+      settings = { 
+        isAutoReplyEnabled: true, 
+        isAwayMode: true, 
+        aiContext: '',
+        defaultReply: 'Thanks for your message! We will get back to you soon. 🙏' 
+      };
     }
 
     // Check if auto-reply is enabled
     if (!settings.isAutoReplyEnabled) {
-      console.log('⏸️ Auto-reply disabled for this user.');
+      console.log(`⏸️ Auto-reply disabled for ${user?.email || 'global'}.`);
       return;
     }
 
     const lowerMessage = messageText.toLowerCase().trim();
 
-    // Get user-specific rules
-    let rules;
+    // Get user-specific rules ONLY
+    let rules = [];
     if (user) {
       rules = await Rule.find({ userId: user._id, isActive: true, platform: { $in: ['messenger', 'both'] } });
     }
-    // Fallback to global rules if user has no rules
-    if (!rules || rules.length === 0) {
+    // Also check global rules (without userId)
+    if (rules.length === 0) {
       rules = await Rule.find({ userId: { $exists: false }, isActive: true, platform: { $in: ['messenger', 'both'] } });
     }
 
@@ -86,52 +99,63 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
     }
 
     if (matchedRule) {
+      // Keyword matched - send rule reply
       console.log(`✅ [${user?.email || 'global'}] Keyword "${matchedRule.keyword}" matched.`);
       await sendMessage(senderId, matchedRule.reply, accessToken);
-    } else if (settings.isAwayMode) {
-      // No keyword matched — try Gemini AI first
-      // Build business context from user's business details + products + AI context
+    } else {
+      // No keyword matched - use AI or default reply
+      console.log(`🔍 [${user?.email || 'global'}] No keyword match. Trying AI...`);
+
+      // Build context from AI Context + Business Details + Products
       let businessContext = '';
 
-      // Use AI Context (client's custom instructions) as primary source
+      // 1. AI Context (primary - what client wrote in the AI Reply box)
       if (settings.aiContext) {
         businessContext += settings.aiContext + '\n\n';
       }
-      
-      if (user) {
-        const bd = user.businessDetails || {};
-        if (bd.businessName) businessContext += `Business: ${bd.businessName}. `;
-        if (bd.category) businessContext += `Category: ${bd.category}. `;
-        if (bd.description) businessContext += `About: ${bd.description}. `;
-        if (bd.address) businessContext += `Address: ${bd.address}. `;
-        if (bd.phone) businessContext += `Phone: ${bd.phone}. `;
-        if (bd.website) businessContext += `Website: ${bd.website}. `;
 
-        // Get user's products/services
+      // 2. Business Details
+      if (user && user.businessDetails) {
+        const bd = user.businessDetails;
+        if (bd.businessName) businessContext += `Business Name: ${bd.businessName}. `;
+        if (bd.category) businessContext += `Category: ${bd.category}. `;
+        if (bd.description) businessContext += `Description: ${bd.description}. `;
+        if (bd.address) businessContext += `Address: ${bd.address}. `;
+        if (bd.phone) businessContext += `Contact: ${bd.phone}. `;
+        if (bd.website) businessContext += `Website: ${bd.website}. `;
+      }
+
+      // 3. Products
+      if (user) {
         const products = await Product.find({ userId: user._id, isAvailable: true });
         if (products.length > 0) {
-          businessContext += '\n\nProducts/Services available:\n';
+          businessContext += '\n\nProducts/Services:\n';
           products.forEach(p => {
             businessContext += `- ${p.name}`;
-            if (p.price) businessContext += ` (Price: ${p.price})`;
-            if (p.description) businessContext += ` - ${p.description}`;
+            if (p.price) businessContext += ` | Price: ${p.price}`;
+            if (p.description) businessContext += ` | ${p.description}`;
+            if (p.category) businessContext += ` [${p.category}]`;
             businessContext += '\n';
           });
         }
       }
 
-      const aiReply = await generateAIReply(messageText, businessContext);
-
-      if (aiReply) {
-        console.log(`🤖 [${user?.email || 'global'}] AI reply generated.`);
-        await sendMessage(senderId, aiReply, accessToken);
-      } else {
-        // Fallback to default reply if AI fails
-        console.log(`🌙 [${user?.email || 'global'}] AI unavailable, sending default reply.`);
-        await sendMessage(senderId, settings.defaultReply, accessToken);
+      // Try AI reply
+      let replied = false;
+      if (businessContext.trim()) {
+        const aiReply = await generateAIReply(messageText, businessContext);
+        if (aiReply) {
+          console.log(`🤖 [${user?.email || 'global'}] AI reply sent.`);
+          await sendMessage(senderId, aiReply, accessToken);
+          replied = true;
+        }
       }
-    } else {
-      console.log(`ℹ️ No match, away mode OFF.`);
+
+      // Fallback to default reply
+      if (!replied && settings.isAwayMode) {
+        console.log(`🌙 [${user?.email || 'global'}] Sending default reply.`);
+        await sendMessage(senderId, settings.defaultReply || 'Thanks for your message!', accessToken);
+      }
     }
   } catch (error) {
     console.error('❌ Error handling message:', error.message);
