@@ -524,6 +524,23 @@ async function checkSystemStatus() {
 }
 
 // ============ AI CONTEXT (Rules page) ============
+async function addRuleFromRulesPage() {
+  const keyword = document.getElementById('ruleKeyword2').value.trim();
+  const reply = document.getElementById('ruleReply2').value.trim();
+  const platform = document.getElementById('rulePlatform2').value;
+
+  if (!keyword || !reply) { showToast('Keyword and reply both required', 'error'); return; }
+
+  try {
+    const result = await createRule({ keyword, reply, platform });
+    if (result.success === false) { showToast(result.message, 'error'); return; }
+    showToast('Rule added!', 'success');
+    document.getElementById('ruleKeyword2').value = '';
+    document.getElementById('ruleReply2').value = '';
+    fetchRules();
+  } catch (e) { showToast('Error adding rule', 'error'); }
+}
+
 async function saveAIContext() {
   try {
     const aiContext = document.getElementById('aiContextRules').value.trim();
