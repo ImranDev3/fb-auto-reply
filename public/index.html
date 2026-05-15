@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FB Auto Reply SaaS - Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <h1>🤖 FB Auto Reply SaaS</h1>
+      <p>Manage your Facebook Messenger auto-reply rules</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+
+    <!-- Add New Rule Form -->
+    <section class="card">
+      <h2>➕ Add New Rule</h2>
+      <form id="ruleForm">
+        <div class="form-group">
+          <label for="keyword">Keyword</label>
+          <input 
+            type="text" 
+            id="keyword" 
+            placeholder="e.g. hello, price, hours" 
+            required
+          >
+          <small>The word/phrase to match in incoming messages</small>
+        </div>
+        <div class="form-group">
+          <label for="reply">Auto Reply</label>
+          <textarea 
+            id="reply" 
+            placeholder="e.g. Hi! Thanks for reaching out. How can I help you?" 
+            rows="3" 
+            required
+          ></textarea>
+          <small>The message to send back automatically</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Rule</button>
+      </form>
+    </section>
+
+    <!-- Rules List -->
+    <section class="card">
+      <h2>📋 All Rules</h2>
+      <div id="rulesContainer">
+        <p class="loading">Loading rules...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>FB Auto Reply SaaS &copy; 2024 | Built with Node.js + Express + MongoDB</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
