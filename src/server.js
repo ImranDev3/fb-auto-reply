@@ -52,8 +52,13 @@ app.use('/api/settings', settingsRoutes);
 // Auth API (register, login, profile)
 app.use('/api/auth', authRoutes);
 
-// Serve the dashboard at root URL
+// Serve the landing page at root URL (marketing page)
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'landing.html'));
+});
+
+// Serve dashboard (protected by frontend auth check)
+app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
