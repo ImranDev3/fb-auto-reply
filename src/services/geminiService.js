@@ -26,7 +26,7 @@ async function generateAIReply(userMessage, businessContext = '') {
 
     console.log(`🤖 Calling Gemini AI with context length: ${businessContext.length} chars`);
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `You are a helpful customer support assistant for a business. 
 ${businessContext ? `Business Info: ${businessContext}` : ''}
