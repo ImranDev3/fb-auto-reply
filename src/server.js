@@ -44,6 +44,11 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
 });
 
+// How to Use / Documentation page
+app.get('/how-to-use', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'how-to-use.html'));
+});
+
 // Dashboard (protected by frontend auth check)
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Use - AutoReply Pro | Complete Setup Guide</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="landing.css">
+  <style>
+    .docs-hero {
+      padding: 120px 0 60px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      text-align: center;
+      color: white;
+    }
+    .docs-hero h1 { font-size: 2.5rem; margin-bottom: 12px; }
+    .docs-hero p { color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+    .docs-content {
+      padding: 60px 0;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .docs-nav {
+      position: sticky;
+      top: 80px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 40px;
+    }
+
+    .docs-nav h3 {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .docs-nav a {
+      display: block;
+      padding: 8px 12px;
+      color: #334155;
+      text-decoration: none;
+      font-size: 0.92rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .docs-nav a:hover {
+      background: #f1f5f9;
+      color: #4f46e5;
+    }
+
+    .doc-section {
+      margin-bottom: 50px;
+      padding: 32px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+    }
+
+    .doc-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .doc-section h2 .step-badge {
+      background: linear-gradient(135deg, #4f46e5, #818cf8);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .doc-section h3 {
+      font-size: 1.1rem;
+      margin: 20px 0 10px;
+      color: #334155;
+    }
+
+    .doc-section p {
+      color: #475569;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+    }
+
+    .doc-section ul, .doc-section ol {
+      margin: 12px 0;
+      padding-left: 24px;
+      color: #475569;
+    }
+
+    .doc-section li {
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid #4f46e5;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+    }
+
+    .info-box.warning {
+      background: #fef3c7;
+      border-left-color: #f59e0b;
+    }
+
+    .info-box.success {
+      background: #ecfdf5;
+      border-left-color: #10b981;
+    }
+
+    .info-box p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .info-box strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.88rem;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    .feature-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+
+    .feature-table th, .feature-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.9rem;
+    }
+
+    .feature-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .feature-table .check { color: #10b981; }
+    .feature-table .cross { color: #ef4444; }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 40px;
+      font-size: 0.95rem;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        <div class="nav-logo"><i class="fas fa-robot"></i></div>
+        <span>AutoReply Pro</span>
+      </a>
+      <div class="nav-links">
+        <a href="/#features">Features</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/how-to-use">Docs</a>
+      </div>
+      <div class="nav-actions">
+        <a href="/login" class="btn-nav-login">Login</a>
+        <a href="/login" class="btn-nav-signup">Start Free Trial</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="docs-hero">
+    <div class="container">
+      <h1>📖 How to Use AutoReply Pro</h1>
+      <p>Complete step-by-step guide to set up your auto-reply bot and start automating customer messages.</p>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <div class="container docs-content">
+
+    <!-- Table of Contents -->
+    <div class="docs-nav">
+      <h3>📋 Table of Contents</h3>
+      <a href="#step1">1. Create Your Account</a>
+      <a href="#step2">2. Access Your Dashboard</a>
+      <a href="#step3">3. Connect Your Facebook Page</a>
+      <a href="#step4">4. Set Up Auto-Reply Rules</a>
+      <a href="#step5">5. Configure Bot Settings</a>
+      <a href="#step6">6. Connect WhatsApp (Pro Plan)</a>
+      <a href="#step7">7. Test Your Bot</a>
+      <a href="#plans">8. Plans & Features Comparison</a>
+      <a href="#faq-docs">9. Troubleshooting & FAQ</a>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="doc-section" id="step1">
+      <h2><span class="step-badge">1</span> Create Your Account</h2>
+      <p>Getting started with AutoReply Pro takes less than 2 minutes.</p>
+      <ol>
+        <li>Go to <strong><a href="/login">AutoReply Pro Sign Up Page</a></strong></li>
+        <li>Click on the <strong>"Sign Up"</strong> tab</li>
+        <li>Enter your <strong>Full Name</strong>, <strong>Email</strong>, and <strong>Password</strong> (minimum 6 characters)</li>
+        <li>Click <strong>"Create Account"</strong></li>
+        <li>You'll be automatically redirected to your Dashboard</li>
+      </ol>
+      <div class="info-box success">
+        <p><strong>🎉 Free Trial Included!</strong> Every new account gets the Free plan with 5 auto-reply rules. No credit card required.</p>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="doc-section" id="step2">
+      <h2><span class="step-badge">2</span> Access Your Dashboard</h2>
+      <p>After login, you'll see your main dashboard with these sections:</p>
+      <ul>
+        <li><strong>📊 Dashboard</strong> — Overview stats + Quick Add Rule form</li>
+        <li><strong>📋 Rules</strong> — View, filter, edit, delete all your auto-reply rules</li>
+        <li><strong>⚙️ Settings</strong> — Bot settings (Away Mode, Default Reply, Greeting)</li>
+        <li><strong>👤 Profile</strong> — Your account info, Page details, Password change, Subscription</li>
+      </ul>
+      <div class="info-box">
+        <p><strong>💡 Tip:</strong> Use the sidebar navigation on the left to switch between sections. On mobile, tap the hamburger menu (☰) to open the sidebar.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="doc-section" id="step3">
+      <h2><span class="step-badge">3</span> Connect Your Facebook Page</h2>
+      <p>To receive and auto-reply to messages, you need to connect your Facebook Page.</p>
+
+      <h3>3.1 — Create a Facebook Developer App</h3>
+      <ol>
+        <li>Go to <a href="https://developers.facebook.com" target="_blank">developers.facebook.com</a></li>
+        <li>Click <strong>"My Apps"</strong> → <strong>"Create App"</strong></li>
+        <li>Choose <strong>"Engage with customers on Messenger from Meta"</strong></li>
+        <li>Enter app name (e.g., "My Auto Reply Bot")</li>
+        <li>Complete the setup</li>
+      </ol>
+
+      <h3>3.2 — Get Your Page Access Token</h3>
+      <ol>
+        <li>In your Facebook App, go to <strong>Messenger → Settings</strong></li>
+        <li>Under <strong>"Access Tokens"</strong>, select your Facebook Page</li>
+        <li>Click <strong>"Generate Token"</strong></li>
+        <li>Copy the token</li>
+      </ol>
+
+      <h3>3.3 — Add Token to AutoReply Pro</h3>
+      <ol>
+        <li>Go to your AutoReply Pro Dashboard → <strong>Profile</strong> section</li>
+        <li>Under <strong>"Page & API Details"</strong>:</li>
+        <li>Enter your <strong>Page Name</strong></li>
+        <li>Enter your <strong>Page ID</strong> (found in Facebook Page settings → About)</li>
+        <li>Paste your <strong>Page Access Token</strong></li>
+        <li>Click <strong>"Save Page Details"</strong></li>
+      </ol>
+
+      <h3>3.4 — Set Up Webhook</h3>
+      <ol>
+        <li>In Facebook App → Messenger → Settings → <strong>Webhooks</strong></li>
+        <li>Click <strong>"Add Callback URL"</strong></li>
+        <li>Enter these values:</li>
+      </ol>
+      <div class="code-block">
+Callback URL: https://fb-auto-reply-2kst.onrender.com/webhook
+Verify Token: my_secret_verify_token
+      </div>
+      <ol start="4">
+        <li>Click <strong>"Verify and Save"</strong></li>
+        <li>Subscribe to: <strong>messages</strong> (check the box)</li>
+      </ol>
+
+      <div class="info-box warning">
+        <p><strong>⚠️ Important:</strong> The Verify Token must match exactly. If you changed it in your settings, use that value instead.</p>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="doc-section" id="step4">
+      <h2><span class="step-badge">4</span> Set Up Auto-Reply Rules</h2>
+      <p>Rules are the heart of AutoReply Pro. Each rule has a <strong>keyword</strong> and a <strong>reply message</strong>.</p>
+
+      <h3>How to Add a Rule:</h3>
+      <ol>
+        <li>Go to <strong>Dashboard</strong></li>
+        <li>In the <strong>"Quick Add Rule"</strong> form:</li>
+        <li>Enter a <strong>Keyword</strong> (e.g., "price", "hello", "hours")</li>
+        <li>Enter the <strong>Auto Reply Message</strong> (what the bot should respond)</li>
+        <li>Select <strong>Platform</strong> (Both, Messenger Only, or WhatsApp Only)</li>
+        <li>Click <strong>"Add Rule"</strong></li>
+      </ol>
+
+      <h3>How Matching Works:</h3>
+      <ul>
+        <li>Keywords are <strong>case-insensitive</strong> (Hello = hello = HELLO)</li>
+        <li>The bot checks if the keyword <strong>exists anywhere</strong> in the message</li>
+        <li>Example: Keyword "price" will match "What's your price?" or "price list please"</li>
+        <li>First matching rule wins (if multiple keywords match)</li>
+      </ul>
+
+      <h3>Example Rules:</h3>
+      <table class="feature-table">
+        <tr><th>Keyword</th><th>Auto Reply</th><th>Platform</th></tr>
+        <tr><td>hello</td><td>Hi! 👋 Thanks for reaching out. How can I help you?</td><td>Both</td></tr>
+        <tr><td>price</td><td>Our plans start at $9.99/month. Visit our website for details!</td><td>Both</td></tr>
+        <tr><td>hours</td><td>We're open Mon-Fri, 9 AM - 5 PM (GMT+6). Feel free to leave a message!</td><td>Both</td></tr>
+        <tr><td>order</td><td>To place an order, please visit our shop: [your link]. Need help? Just ask!</td><td>Messenger</td></tr>
+        <tr><td>thanks</td><td>You're welcome! 😊 Let us know if you need anything else.</td><td>Both</td></tr>
+      </table>
+
+      <div class="info-box">
+        <p><strong>💡 Pro Tip:</strong> Add common questions as keywords. Think about what your customers ask most frequently.</p>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="doc-section" id="step5">
+      <h2><span class="step-badge">5</span> Configure Bot Settings</h2>
+      <p>Go to the <strong>Settings</strong> section to configure how your bot behaves.</p>
+
+      <h3>Available Settings:</h3>
+      <table class="feature-table">
+        <tr><th>Setting</th><th>Description</th><th>Recommended</th></tr>
+        <tr><td><strong>Auto Reply (Master Switch)</strong></td><td>Turns the entire bot ON or OFF. When OFF, no replies are sent.</td><td>ON ✅</td></tr>
+        <tr><td><strong>Away Mode (24/7)</strong></td><td>When ON, sends a default reply even if no keyword matches. Bot works without you being online.</td><td>ON ✅</td></tr>
+        <tr><td><strong>Greeting Message</strong></td><td>Sends a welcome message to first-time users.</td><td>ON ✅</td></tr>
+      </table>
+
+      <h3>Custom Messages:</h3>
+      <ul>
+        <li><strong>Default Reply:</strong> Sent when no keyword matches (e.g., "Thanks for your message! We'll reply soon.")</li>
+        <li><strong>Away Message:</strong> Sent when you're away (e.g., "We're currently offline. We'll get back to you within 24 hours.")</li>
+        <li><strong>Greeting Message:</strong> Welcome message for new users (e.g., "Welcome! 👋 How can we help you today?")</li>
+      </ul>
+
+      <div class="info-box success">
+        <p><strong>🌙 Away Mode = 24/7 Bot:</strong> With Away Mode ON, your bot ALWAYS replies — even at 3 AM. Your customers never wait for a response!</p>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="doc-section" id="step6">
+      <h2><span class="step-badge">6</span> Connect WhatsApp (Pro Plan)</h2>
+      <p>WhatsApp auto-reply is available on the <strong>Pro</strong> and <strong>Enterprise</strong> plans.</p>
+
+      <h3>Setup Steps:</h3>
+      <ol>
+        <li>In your Facebook Developer App, add the <strong>WhatsApp</strong> product</li>
+        <li>Set up a WhatsApp Business phone number</li>
+        <li>Get your <strong>WhatsApp Phone Number ID</strong> and <strong>Access Token</strong></li>
+        <li>In AutoReply Pro → Profile → Page & API Details:</li>
+        <li>Enter <strong>WhatsApp Phone Number ID</strong></li>
+        <li>Enter <strong>WhatsApp Access Token</strong></li>
+        <li>Click <strong>"Save Page Details"</strong></li>
+      </ol>
+
+      <h3>WhatsApp Webhook:</h3>
+      <div class="code-block">
+Callback URL: https://fb-auto-reply-2kst.onrender.com/whatsapp/webhook
+Verify Token: my_secret_verify_token
+Subscribe to: messages
+      </div>
+
+      <div class="info-box warning">
+        <p><strong>⚠️ Note:</strong> WhatsApp Business API requires a verified business. Make sure your Meta Business account is set up properly.</p>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="doc-section" id="step7">
+      <h2><span class="step-badge">7</span> Test Your Bot</h2>
+      <p>After setup, test your bot to make sure everything works:</p>
+
+      <h3>Testing Messenger:</h3>
+      <ol>
+        <li>Open Facebook Messenger</li>
+        <li>Send a message to your connected Facebook Page from a <strong>different account</strong></li>
+        <li>Type a keyword you've set up (e.g., "hello")</li>
+        <li>You should receive the auto-reply within seconds! 🎉</li>
+      </ol>
+
+      <h3>Testing WhatsApp:</h3>
+      <ol>
+        <li>Open WhatsApp</li>
+        <li>Send a message to your WhatsApp Business number</li>
+        <li>Type a keyword you've set up</li>
+        <li>Auto-reply should come back instantly!</li>
+      </ol>
+
+      <div class="info-box success">
+        <p><strong>✅ Success!</strong> If you receive the auto-reply, your bot is working perfectly. It will now reply 24/7 automatically!</p>
+      </div>
+    </div>
+
+    <!-- Plans -->
+    <div class="doc-section" id="plans">
+      <h2><span class="step-badge">8</span> Plans & Features Comparison</h2>
+      <p>Choose the plan that fits your business needs:</p>
+
+      <table class="feature-table">
+        <tr>
+          <th>Feature</th>
+          <th>Free ($0)</th>
+          <th>Pro ($9.99/mo)</th>
+          <th>Enterprise ($29.99/mo)</th>
+        </tr>
+        <tr>
+          <td>Auto-Reply Rules</td>
+          <td>5 rules</td>
+          <td>100 rules</td>
+          <td>Unlimited</td>
+        </tr>
+        <tr>
+          <td>Facebook Messenger</td>
+          <td><i class="fas fa-check check"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+        </tr>
+        <tr>
+          <td>WhatsApp</td>
+          <td><i class="fas fa-times cross"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+        </tr>
+        <tr>
+          <td>Away Mode (24/7)</td>
+          <td><i class="fas fa-check check"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+        </tr>
+        <tr>
+          <td>Greeting Messages</td>
+          <td><i class="fas fa-check check"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+        </tr>
+        <tr>
+          <td>Multiple Pages</td>
+          <td><i class="fas fa-times cross"></i></td>
+          <td><i class="fas fa-times cross"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+        </tr>
+        <tr>
+          <td>API Access</td>
+          <td><i class="fas fa-times cross"></i></td>
+          <td><i class="fas fa-times cross"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+        </tr>
+        <tr>
+          <td>Priority Support</td>
+          <td><i class="fas fa-times cross"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+        </tr>
+        <tr>
+          <td>Dedicated Support</td>
+          <td><i class="fas fa-times cross"></i></td>
+          <td><i class="fas fa-times cross"></i></td>
+          <td><i class="fas fa-check check"></i></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- FAQ -->
+    <div class="doc-section" id="faq-docs">
+      <h2><span class="step-badge">9</span> Troubleshooting & FAQ</h2>
+
+      <h3>❓ Bot is not replying to messages</h3>
+      <ul>
+        <li>Check if <strong>Auto Reply (Master Switch)</strong> is ON in Settings</li>
+        <li>Verify your <strong>Page Access Token</strong> is correct in Profile</li>
+        <li>Make sure the <strong>Webhook</strong> is properly set up in Facebook Developer Console</li>
+        <li>Check that you've subscribed to <strong>"messages"</strong> in webhook settings</li>
+      </ul>
+
+      <h3>❓ Webhook verification failed</h3>
+      <ul>
+        <li>Make sure the <strong>Verify Token</strong> matches exactly: <code>my_secret_verify_token</code></li>
+        <li>Check that the Callback URL is correct and the server is running</li>
+      </ul>
+
+      <h3>❓ I reached my rule limit</h3>
+      <ul>
+        <li>Free plan allows 5 rules. Upgrade to Pro for 100 rules or Enterprise for unlimited.</li>
+        <li>You can delete old rules to make space for new ones.</li>
+      </ul>
+
+      <h3>❓ Can I use this for multiple pages?</h3>
+      <ul>
+        <li>Enterprise plan supports multiple pages. Free and Pro plans support 1 page each.</li>
+      </ul>
+
+      <h3>❓ Is my data secure?</h3>
+      <ul>
+        <li>Yes! All data is encrypted and isolated per user. No one else can access your rules or tokens.</li>
+        <li>We use JWT authentication and bcrypt password hashing.</li>
+      </ul>
+
+      <h3>❓ How do I cancel my subscription?</h3>
+      <ul>
+        <li>You can cancel anytime from your Profile page. Your account will revert to the Free plan.</li>
+      </ul>
+    </div>
+
+    <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+        <p>&copy; 2024 AutoReply Pro. All rights reserved.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
