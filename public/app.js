@@ -2,15 +2,32 @@
  * AutoReply Pro - Professional Dashboard JavaScript
  * 
  * Features:
- * - Section navigation (Dashboard, Rules, Settings)
+ * - Authentication (login required)
+ * - Section navigation (Dashboard, Rules, Settings, Profile)
  * - CRUD operations for rules
  * - Settings management
+ * - Profile & Page management
  * - Filter & Stats
  * - Toast notifications
- * - Responsive sidebar
  */
 
 const API_URL = '/api/rules';
+
+// ============ AUTH CHECK ============
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+if (!token) {
+  window.location.href = '/login.html';
+}
+
+// Auth headers for all API calls
+function authHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+}
 
 // DOM Elements
 const ruleForm = document.getElementById('ruleForm');
@@ -27,11 +44,27 @@ let currentFilter = 'all';
 
 // ============ INITIALIZATION ============
 document.addEventListener('DOMContentLoaded', () => {
+  // Show user name in sidebar
+  if (user) {
+    const nameEl = document.getElementById('userName');
+    if (nameEl) nameEl.textContent = user.name || 'User';
+    const planEl = document.getElementById('userPlan');
+    if (planEl) planEl.textContent = (user.subscription?.plan || 'free').toUpperCase() + ' Plan';
+  }
+
   fetchRules();
   fetchSettings();
+  fetchProfile();
   setupNavigation();
   setupFilterButtons();
 });
+
+// ============ LOGOUT ============
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = '/login.html';
+}
 
 // ============ NAVIGATION ============
 function setupNavigation() {
@@ -40,19 +73,15 @@ function setupNavigation() {
       e.preventDefault();
       const section = item.dataset.section;
 
-      // Update active nav
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       item.classList.add('active');
 
-      // Show section
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(`section-${section}`).classList.add('active');
 
-      // Update title
-      const titles = { dashboard: 'Dashboard', rules: 'Rules', settings: 'Settings' };
+      const titles = { dashboard: 'Dashboard', rules: 'Rules', settings: 'Settings', profile: 'Profile' };
       document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
 
-      // Close sidebar on mobile
       document.getElementById('sidebar').classList.remove('open');
     });
   });
@@ -99,7 +128,11 @@ ruleForm.addEventListener('submit', async (e) => {
       editingRuleId = null;
       formBtnText.textContent = 'Add Rule';
     } else {
-      await createRule({ keyword, reply, platform });
+      const result = await createRule({ keyword, reply, platform });
+      if (result.success === false) {
+        showToast(result.message, 'error');
+        return;
+      }
       showToast('Rule added successfully!', 'success');
     }
 
@@ -107,14 +140,16 @@ ruleForm.addEventListener('submit', async (e) => {
     fetchRules();
   } catch (error) {
     showToast('Error saving rule. Please try again.', 'error');
-    console.error(error);
   }
 });
 
 // ============ FETCH ALL RULES ============
 async function fetchRules() {
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, { headers: authHeaders() });
+
+    if (response.status === 401) { logout(); return; }
+
     const data = await response.json();
 
     if (data.success) {
@@ -136,7 +171,7 @@ async function fetchRules() {
     rulesContainer.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-exclamation-triangle"></i>
-        <p>Error loading rules. Is the server running?</p>
+        <p>Error loading rules.</p>
       </div>
     `;
   }
@@ -175,7 +210,7 @@ function renderRules(rules) {
             ${rule.isActive ? '● Active' : '● Inactive'}
           </span>
           <span class="badge badge-${rule.platform || 'both'}">
-            ${getPlatformIcon(rule.platform)} ${getPlatformLabel(rule.platform)}
+            ${getPlatformLabel(rule.platform)}
           </span>
         </div>
       </div>
@@ -191,7 +226,6 @@ function renderRules(rules) {
   `).join('');
 }
 
-// ============ HELPERS ============
 function getPlatformLabel(platform) {
   switch (platform) {
     case 'messenger': return 'Messenger';
@@ -200,19 +234,11 @@ function getPlatformLabel(platform) {
   }
 }
 
-function getPlatformIcon(platform) {
-  switch (platform) {
-    case 'messenger': return '<i class="fab fa-facebook-messenger"></i>';
-    case 'whatsapp': return '<i class="fab fa-whatsapp"></i>';
-    default: return '<i class="fas fa-link"></i>';
-  }
-}
-
 // ============ CRUD OPERATIONS ============
 async function createRule(data) {
   const res = await fetch(API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(data)
   });
   return res.json();
@@ -221,7 +247,7 @@ async function createRule(data) {
 async function updateRule(id, data) {
   const res = await fetch(`${API_URL}/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(data)
   });
   return res.json();
@@ -234,13 +260,11 @@ function editRule(id, keyword, reply, platform) {
   platformSelect.value = platform || 'both';
   formBtnText.textContent = 'Update Rule';
 
-  // Switch to dashboard section and scroll to form
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelector('[data-section="dashboard"]').classList.add('active');
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('section-dashboard').classList.add('active');
   document.getElementById('pageTitle').textContent = 'Dashboard';
-
   ruleForm.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -248,7 +272,7 @@ async function deleteRule(id) {
   if (!confirm('Are you sure you want to delete this rule?')) return;
 
   try {
-    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE', headers: authHeaders() });
     const data = await res.json();
 
     if (data.success) {
@@ -265,7 +289,8 @@ async function deleteRule(id) {
 // ============ SETTINGS ============
 async function fetchSettings() {
   try {
-    const res = await fetch('/api/settings');
+    const res = await fetch('/api/settings', { headers: authHeaders() });
+    if (res.status === 401) return;
     const data = await res.json();
 
     if (data.success) {
@@ -295,18 +320,132 @@ async function saveSettings() {
 
     const res = await fetch('/api/settings', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify(settings)
     });
 
     const data = await res.json();
     if (data.success) {
-      showToast('Settings saved successfully!', 'success');
+      showToast('Settings saved!', 'success');
     } else {
       showToast('Error saving settings', 'error');
     }
   } catch (error) {
     showToast('Error saving settings', 'error');
+  }
+}
+
+// ============ PROFILE ============
+async function fetchProfile() {
+  try {
+    const res = await fetch('/api/auth/me', { headers: authHeaders() });
+    if (res.status === 401) return;
+    const data = await res.json();
+
+    if (data.success) {
+      const u = data.data;
+      document.getElementById('profileName').value = u.name || '';
+      document.getElementById('profileEmail').value = u.email || '';
+      document.getElementById('profilePhone').value = u.phone || '';
+      document.getElementById('pageName').value = u.pageDetails?.pageName || '';
+      document.getElementById('pageId').value = u.pageDetails?.pageId || '';
+      document.getElementById('pageToken').value = u.pageDetails?.pageAccessToken || '';
+      document.getElementById('waPhoneId').value = u.pageDetails?.whatsappPhoneNumberId || '';
+      document.getElementById('waToken').value = u.pageDetails?.whatsappAccessToken || '';
+    }
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+  }
+}
+
+async function saveProfile() {
+  try {
+    const profileData = {
+      name: document.getElementById('profileName').value.trim(),
+      email: document.getElementById('profileEmail').value.trim(),
+      phone: document.getElementById('profilePhone').value.trim()
+    };
+
+    const res = await fetch('/api/auth/profile', {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify(profileData)
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast('Profile updated!', 'success');
+      // Update local storage
+      const stored = JSON.parse(localStorage.getItem('user'));
+      stored.name = profileData.name;
+      localStorage.setItem('user', JSON.stringify(stored));
+      document.getElementById('userName').textContent = profileData.name;
+    } else {
+      showToast(data.message || 'Error updating profile', 'error');
+    }
+  } catch (error) {
+    showToast('Error updating profile', 'error');
+  }
+}
+
+async function savePageDetails() {
+  try {
+    const pageData = {
+      pageName: document.getElementById('pageName').value.trim(),
+      pageId: document.getElementById('pageId').value.trim(),
+      pageAccessToken: document.getElementById('pageToken').value.trim(),
+      whatsappPhoneNumberId: document.getElementById('waPhoneId').value.trim(),
+      whatsappAccessToken: document.getElementById('waToken').value.trim()
+    };
+
+    const res = await fetch('/api/auth/page', {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify(pageData)
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast('Page details saved!', 'success');
+    } else {
+      showToast('Error saving page details', 'error');
+    }
+  } catch (error) {
+    showToast('Error saving page details', 'error');
+  }
+}
+
+async function changePassword() {
+  const current = document.getElementById('currentPassword').value;
+  const newPass = document.getElementById('newPassword').value;
+
+  if (!current || !newPass) {
+    showToast('Fill in both password fields', 'error');
+    return;
+  }
+
+  if (newPass.length < 6) {
+    showToast('New password must be at least 6 characters', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/auth/password', {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast('Password changed!', 'success');
+      document.getElementById('currentPassword').value = '';
+      document.getElementById('newPassword').value = '';
+    } else {
+      showToast(data.message || 'Error changing password', 'error');
+    }
+  } catch (error) {
+    showToast('Error changing password', 'error');
   }
 }
 
@@ -317,7 +456,6 @@ function showToast(message, type = 'success') {
   toast.className = `toast toast-${type}`;
   toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
   container.appendChild(toast);
-
   setTimeout(() => toast.remove(), 3500);
 }
 

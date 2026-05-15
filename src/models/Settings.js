@@ -11,6 +11,12 @@
 const mongoose = require('mongoose');
 
 const settingsSchema = new mongoose.Schema({
+  // Which user owns these settings
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   // Default reply when no keyword matches
   defaultReply: {
     type: String,

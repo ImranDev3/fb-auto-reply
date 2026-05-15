@@ -19,6 +19,7 @@ const webhookRoutes = require('./routes/webhook');
 const rulesRoutes = require('./routes/rules');
 const whatsappRoutes = require('./routes/whatsapp');
 const settingsRoutes = require('./routes/settings');
+const authRoutes = require('./routes/auth');
 
 // Create Express app
 const app = express();
@@ -47,6 +48,9 @@ app.use('/api/rules', rulesRoutes);
 
 // Settings API
 app.use('/api/settings', settingsRoutes);
+
+// Auth API (register, login, profile)
+app.use('/api/auth', authRoutes);
 
 // Serve the dashboard at root URL
 app.get('/', (req, res) => {

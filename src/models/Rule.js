@@ -11,6 +11,12 @@
 const mongoose = require('mongoose');
 
 const ruleSchema = new mongoose.Schema({
+  // Which user owns this rule
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   // The keyword to match (stored in lowercase for easy matching)
   keyword: {
     type: String,

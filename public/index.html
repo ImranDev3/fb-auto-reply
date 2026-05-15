@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoReply Pro - Smart Messenger & WhatsApp Bot</title>
+  <title>AutoReply Pro - Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -12,54 +12,51 @@
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <div class="brand-icon">
-        <i class="fas fa-robot"></i>
-      </div>
+      <div class="brand-icon"><i class="fas fa-robot"></i></div>
       <span class="brand-text">AutoReply Pro</span>
     </div>
     <nav class="sidebar-nav">
       <a href="#" class="nav-item active" data-section="dashboard">
-        <i class="fas fa-chart-line"></i>
-        <span>Dashboard</span>
+        <i class="fas fa-chart-line"></i><span>Dashboard</span>
       </a>
       <a href="#" class="nav-item" data-section="rules">
-        <i class="fas fa-list-check"></i>
-        <span>Rules</span>
+        <i class="fas fa-list-check"></i><span>Rules</span>
       </a>
       <a href="#" class="nav-item" data-section="settings">
-        <i class="fas fa-gear"></i>
-        <span>Settings</span>
+        <i class="fas fa-gear"></i><span>Settings</span>
+      </a>
+      <a href="#" class="nav-item" data-section="profile">
+        <i class="fas fa-user-circle"></i><span>Profile</span>
       </a>
     </nav>
     <div class="sidebar-footer">
-      <div class="status-indicator">
-        <span class="status-dot"></span>
-        <span>System Active</span>
+      <div class="user-info">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+        <div class="user-details">
+          <span class="user-name" id="userName">User</span>
+          <span class="user-plan" id="userPlan">FREE Plan</span>
+        </div>
       </div>
+      <button class="btn-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
     </div>
   </aside>
 
   <!-- Main Content -->
   <div class="main-wrapper">
-    <!-- Top Bar -->
     <header class="topbar">
-      <button class="menu-toggle" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-      </button>
-      <div class="topbar-title">
-        <h1 id="pageTitle">Dashboard</h1>
-      </div>
+      <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      <div class="topbar-title"><h1 id="pageTitle">Dashboard</h1></div>
       <div class="topbar-actions">
         <span class="live-badge"><i class="fas fa-circle"></i> Live</span>
       </div>
     </header>
 
-    <!-- Content Area -->
     <main class="content">
 
-      <!-- ========== DASHBOARD SECTION ========== -->
+      <!-- ========== DASHBOARD ========== -->
       <section id="section-dashboard" class="section active">
-        <!-- Stats Cards -->
         <div class="stats-grid">
           <div class="stat-card stat-blue">
             <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
@@ -91,11 +88,8 @@
           </div>
         </div>
 
-        <!-- Quick Add Rule -->
         <div class="card">
-          <div class="card-header">
-            <h2><i class="fas fa-plus-circle"></i> Quick Add Rule</h2>
-          </div>
+          <div class="card-header"><h2><i class="fas fa-plus-circle"></i> Quick Add Rule</h2></div>
           <form id="ruleForm" class="rule-form">
             <div class="form-row">
               <div class="form-group">
@@ -113,7 +107,7 @@
             </div>
             <div class="form-group">
               <label for="reply"><i class="fas fa-reply"></i> Auto Reply Message</label>
-              <textarea id="reply" placeholder="e.g. Hi! Thanks for reaching out. How can I help you?" rows="3" required></textarea>
+              <textarea id="reply" placeholder="e.g. Hi! Thanks for reaching out." rows="3" required></textarea>
             </div>
             <button type="submit" class="btn btn-primary btn-lg">
               <i class="fas fa-plus"></i> <span id="formBtnText">Add Rule</span>
@@ -122,7 +116,7 @@
         </div>
       </section>
 
-      <!-- ========== RULES SECTION ========== -->
+      <!-- ========== RULES ========== -->
       <section id="section-rules" class="section">
         <div class="card">
           <div class="card-header">
@@ -135,71 +129,165 @@
             </div>
           </div>
           <div id="rulesContainer">
-            <div class="loading-spinner">
-              <i class="fas fa-spinner fa-spin"></i> Loading rules...
-            </div>
+            <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading rules...</div>
           </div>
         </div>
       </section>
 
-      <!-- ========== SETTINGS SECTION ========== -->
+      <!-- ========== SETTINGS ========== -->
       <section id="section-settings" class="section">
         <div class="card">
-          <div class="card-header">
-            <h2><i class="fas fa-gear"></i> Bot Settings</h2>
-          </div>
-          
+          <div class="card-header"><h2><i class="fas fa-gear"></i> Bot Settings</h2></div>
           <div class="settings-list">
             <div class="setting-item">
               <div class="setting-info">
                 <div class="setting-title"><i class="fas fa-power-off"></i> Auto Reply (Master Switch)</div>
-                <div class="setting-desc">Enable/disable all auto replies. When OFF, bot won't respond to any messages.</div>
+                <div class="setting-desc">Enable/disable all auto replies.</div>
               </div>
-              <label class="toggle">
-                <input type="checkbox" id="toggleAutoReply" checked>
-                <span class="toggle-slider"></span>
-              </label>
+              <label class="toggle"><input type="checkbox" id="toggleAutoReply" checked><span class="toggle-slider"></span></label>
             </div>
-
             <div class="setting-item">
               <div class="setting-info">
                 <div class="setting-title"><i class="fas fa-moon"></i> Away Mode (24/7 Reply)</div>
-                <div class="setting-desc">When ON, sends default reply even if no keyword matches. Bot works without admin.</div>
+                <div class="setting-desc">Sends default reply when no keyword matches. Works without admin.</div>
               </div>
-              <label class="toggle">
-                <input type="checkbox" id="toggleAwayMode" checked>
-                <span class="toggle-slider"></span>
-              </label>
+              <label class="toggle"><input type="checkbox" id="toggleAwayMode" checked><span class="toggle-slider"></span></label>
             </div>
-
             <div class="setting-item">
               <div class="setting-info">
                 <div class="setting-title"><i class="fas fa-hand-wave"></i> Greeting Message</div>
-                <div class="setting-desc">Send welcome message to first-time users automatically.</div>
+                <div class="setting-desc">Welcome message for first-time users.</div>
               </div>
-              <label class="toggle">
-                <input type="checkbox" id="toggleGreeting" checked>
-                <span class="toggle-slider"></span>
-              </label>
+              <label class="toggle"><input type="checkbox" id="toggleGreeting" checked><span class="toggle-slider"></span></label>
             </div>
           </div>
-
           <div class="settings-messages">
             <div class="form-group">
-              <label><i class="fas fa-comment-dots"></i> Default Reply (when no keyword matches)</label>
-              <textarea id="defaultReply" rows="2" placeholder="Thanks for your message! We will get back to you soon."></textarea>
+              <label><i class="fas fa-comment-dots"></i> Default Reply</label>
+              <textarea id="defaultReply" rows="2" placeholder="Thanks for your message!"></textarea>
             </div>
             <div class="form-group">
               <label><i class="fas fa-moon"></i> Away Message</label>
-              <textarea id="awayMessage" rows="2" placeholder="Hi! We are currently away. We will reply soon."></textarea>
+              <textarea id="awayMessage" rows="2" placeholder="We are currently away."></textarea>
             </div>
             <div class="form-group">
               <label><i class="fas fa-hand-wave"></i> Greeting Message</label>
-              <textarea id="greetingMessage" rows="2" placeholder="Welcome! How can we help you today?"></textarea>
+              <textarea id="greetingMessage" rows="2" placeholder="Welcome! How can we help?"></textarea>
             </div>
-            <button class="btn btn-primary btn-lg" onclick="saveSettings()">
-              <i class="fas fa-save"></i> Save Settings
-            </button>
+            <button class="btn btn-primary btn-lg" onclick="saveSettings()"><i class="fas fa-save"></i> Save Settings</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== PROFILE ========== -->
+      <section id="section-profile" class="section">
+        <!-- Profile Info -->
+        <div class="card">
+          <div class="card-header"><h2><i class="fas fa-user-circle"></i> Profile Information</h2></div>
+          <div class="rule-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" id="profileName" placeholder="Your name">
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-phone"></i> Phone</label>
+                <input type="text" id="profilePhone" placeholder="Phone number">
+              </div>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-envelope"></i> Email</label>
+              <input type="email" id="profileEmail" placeholder="your@email.com">
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-save"></i> Save Profile</button>
+          </div>
+        </div>
+
+        <!-- Page Details -->
+        <div class="card">
+          <div class="card-header"><h2><i class="fab fa-facebook"></i> Page & API Details</h2></div>
+          <div class="rule-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-file"></i> Page Name</label>
+                <input type="text" id="pageName" placeholder="Your Facebook Page name">
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-id-badge"></i> Page ID</label>
+                <input type="text" id="pageId" placeholder="Facebook Page ID">
+              </div>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-key"></i> Page Access Token</label>
+              <input type="password" id="pageToken" placeholder="Facebook Page Access Token">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fab fa-whatsapp"></i> WhatsApp Phone Number ID</label>
+                <input type="text" id="waPhoneId" placeholder="WhatsApp Phone Number ID">
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-key"></i> WhatsApp Access Token</label>
+                <input type="password" id="waToken" placeholder="WhatsApp Access Token">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="savePageDetails()"><i class="fas fa-save"></i> Save Page Details</button>
+          </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="card">
+          <div class="card-header"><h2><i class="fas fa-lock"></i> Change Password</h2></div>
+          <div class="rule-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-lock"></i> Current Password</label>
+                <input type="password" id="currentPassword" placeholder="Current password">
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-key"></i> New Password</label>
+                <input type="password" id="newPassword" placeholder="New password (min 6 chars)">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-save"></i> Change Password</button>
+          </div>
+        </div>
+
+        <!-- Subscription -->
+        <div class="card">
+          <div class="card-header"><h2><i class="fas fa-crown"></i> Subscription Plan</h2></div>
+          <div class="plans-grid">
+            <div class="plan-card plan-free">
+              <div class="plan-name">Free</div>
+              <div class="plan-price">$0<span>/mo</span></div>
+              <ul class="plan-features">
+                <li><i class="fas fa-check"></i> 5 Auto-Reply Rules</li>
+                <li><i class="fas fa-check"></i> Messenger Support</li>
+                <li><i class="fas fa-check"></i> Away Mode</li>
+                <li><i class="fas fa-times"></i> WhatsApp Support</li>
+              </ul>
+            </div>
+            <div class="plan-card plan-pro">
+              <div class="plan-badge">Popular</div>
+              <div class="plan-name">Pro</div>
+              <div class="plan-price">$9.99<span>/mo</span></div>
+              <ul class="plan-features">
+                <li><i class="fas fa-check"></i> 100 Auto-Reply Rules</li>
+                <li><i class="fas fa-check"></i> Messenger + WhatsApp</li>
+                <li><i class="fas fa-check"></i> Away Mode</li>
+                <li><i class="fas fa-check"></i> Priority Support</li>
+              </ul>
+            </div>
+            <div class="plan-card plan-enterprise">
+              <div class="plan-name">Enterprise</div>
+              <div class="plan-price">$29.99<span>/mo</span></div>
+              <ul class="plan-features">
+                <li><i class="fas fa-check"></i> Unlimited Rules</li>
+                <li><i class="fas fa-check"></i> All Platforms</li>
+                <li><i class="fas fa-check"></i> API Access</li>
+                <li><i class="fas fa-check"></i> Dedicated Support</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -207,9 +295,7 @@
     </main>
   </div>
 
-  <!-- Toast Container -->
   <div id="toastContainer"></div>
-
   <script src="app.js"></script>
 </body>
 </html>

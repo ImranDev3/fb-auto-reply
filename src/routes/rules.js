@@ -1,8 +1,10 @@
 /**
- * Rules API Routes
+ * Rules API Routes (User-specific)
  * 
- * CRUD endpoints for managing auto-reply rules:
- * GET    /api/rules       - Get all rules
+ * All routes are protected - user must be logged in
+ * Each user only sees/manages their own rules
+ * 
+ * GET    /api/rules       - Get user's rules
  * POST   /api/rules       - Create a new rule
  * PUT    /api/rules/:id   - Update a rule
  * DELETE /api/rules/:id   - Delete a rule
@@ -11,12 +13,15 @@
 const express = require('express');
 const router = express.Router();
 const Rule = require('../models/Rule');
+const { protect } = require('../middleware/auth');
 
-// ============ GET ALL RULES ============
+// All routes require authentication
+router.use(protect);
+
+// ============ GET ALL RULES (user's own) ============
 router.get('/', async (req, res) => {
   try {
-    // Fetch all rules, newest first
-    const rules = await Rule.find().sort({ createdAt: -1 });
+    const rules = await Rule.find({ userId: req.user._id }).sort({ createdAt: -1 });
     res.json({ success: true, data: rules });
   } catch (error) {
     console.error('Error fetching rules:', error.message);
@@ -29,16 +34,28 @@ router.post('/', async (req, res) => {
   try {
     const { keyword, reply, platform } = req.body;
 
-    // Validate input
     if (!keyword || !reply) {
-      return res.status(400).json({
+      return res.status(400).json({ success: false, message: 'Both keyword and reply are required' });
+    }
+
+    // Check subscription limit
+    const ruleCount = await Rule.countDocuments({ userId: req.user._id });
+    const maxRules = req.user.subscription.maxRules;
+
+    if (ruleCount >= maxRules) {
+      return res.status(403).json({
         success: false,
-        message: 'Both keyword and reply are required'
+        message: `Rule limit reached (${maxRules}). Upgrade your plan for more rules.`
       });
     }
 
-    // Create and save the rule
-    const rule = await Rule.create({ keyword, reply, platform: platform || 'both' });
+    const rule = await Rule.create({
+      userId: req.user._id,
+      keyword,
+      reply,
+      platform: platform || 'both'
+    });
+
     res.status(201).json({ success: true, data: rule });
   } catch (error) {
     console.error('Error creating rule:', error.message);
@@ -51,16 +68,19 @@ router.put('/:id', async (req, res) => {
   try {
     const { keyword, reply, isActive, platform } = req.body;
 
-    const rule = await Rule.findByIdAndUpdate(
-      req.params.id,
-      { keyword, reply, isActive, platform },
-      { new: true, runValidators: true }
-    );
+    // Only allow updating own rules
+    const rule = await Rule.findOne({ _id: req.params.id, userId: req.user._id });
 
     if (!rule) {
       return res.status(404).json({ success: false, message: 'Rule not found' });
     }
 
+    if (keyword !== undefined) rule.keyword = keyword;
+    if (reply !== undefined) rule.reply = reply;
+    if (isActive !== undefined) rule.isActive = isActive;
+    if (platform !== undefined) rule.platform = platform;
+
+    await rule.save();
     res.json({ success: true, data: rule });
   } catch (error) {
     console.error('Error updating rule:', error.message);
@@ -71,7 +91,7 @@ router.put('/:id', async (req, res) => {
 // ============ DELETE A RULE ============
 router.delete('/:id', async (req, res) => {
   try {
-    const rule = await Rule.findByIdAndDelete(req.params.id);
+    const rule = await Rule.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
 
     if (!rule) {
       return res.status(404).json({ success: false, message: 'Rule not found' });
