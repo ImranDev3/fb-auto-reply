@@ -307,6 +307,9 @@ async function fetchSettings() {
       document.getElementById('awayMessage').value = s.awayMessage || '';
       document.getElementById('greetingMessage').value = s.greetingMessage || '';
       document.getElementById('aiContext').value = s.aiContext || '';
+      // Also fill Rules page AI context field
+      const rulesAiField = document.getElementById('aiContextRules');
+      if (rulesAiField) rulesAiField.value = s.aiContext || '';
     }
   } catch (error) {
     console.error('Error fetching settings:', error);
@@ -475,6 +478,27 @@ function escapeHtml(text) {
 
 function escapeAttr(text) {
   return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// ============ AI CONTEXT (Rules page) ============
+async function saveAIContext() {
+  try {
+    const aiContext = document.getElementById('aiContextRules').value.trim();
+    const res = await fetch('/api/settings', {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ aiContext })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('AI info saved! Bot will use this to reply.', 'success');
+      // Sync with settings page too
+      const settingsField = document.getElementById('aiContext');
+      if (settingsField) settingsField.value = aiContext;
+    } else {
+      showToast('Error saving', 'error');
+    }
+  } catch (e) { showToast('Error saving', 'error'); }
 }
 
 // ============ ADMIN CHECK ============
