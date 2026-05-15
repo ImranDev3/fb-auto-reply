@@ -88,6 +88,13 @@ const userSchema = new mongoose.Schema({
     }
   },
 
+  // Message stats (count how many messages received & replied)
+  messageStats: {
+    totalReceived: { type: Number, default: 0 },
+    totalReplied: { type: Number, default: 0 },
+    lastMessageAt: { type: Date, default: null }
+  },
+
   // Account status
   isActive: {
     type: Boolean,

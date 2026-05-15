@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchProfile();
   fetchProducts();
   fetchBusinessDetails();
+  fetchMessageStats();
   setupNavigation();
   setupFilterButtons();
   checkSystemStatus();
@@ -187,8 +188,29 @@ async function fetchRules() {
 function updateStats(rules) {
   document.getElementById('totalRules').textContent = rules.length;
   document.getElementById('activeRules').textContent = rules.filter(r => r.isActive).length;
-  document.getElementById('messengerRules').textContent = rules.filter(r => r.platform === 'messenger' || r.platform === 'both').length;
-  document.getElementById('whatsappRules').textContent = rules.filter(r => r.platform === 'whatsapp' || r.platform === 'both').length;
+}
+
+// ============ FETCH MESSAGE STATS + PAGE STATUS ============
+async function fetchMessageStats() {
+  try {
+    const res = await fetch('/api/auth/stats', { headers: authHeaders() });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('totalReceived').textContent = data.data.totalReceived;
+      document.getElementById('totalReplied').textContent = data.data.totalReplied;
+
+      // Update page connection banner
+      const banner = document.getElementById('pageStatusBanner');
+      if (data.data.isPageConnected) {
+        banner.style.borderLeftColor = '#10b981';
+        document.getElementById('pageStatusIcon').className = 'fas fa-check-circle';
+        document.getElementById('pageStatusIcon').style.color = '#10b981';
+        document.getElementById('pageStatusTitle').textContent = 'Page Connected Successfully ✅';
+        document.getElementById('pageStatusDesc').textContent = 'Your page is connected and bot is active. Messages will be auto-replied.';
+        document.getElementById('pageStatusBtn').innerHTML = '<i class="fas fa-cog"></i> Manage';
+      }
+    }
+  } catch (e) {}
 }
 
 // ============ RENDER RULES ============

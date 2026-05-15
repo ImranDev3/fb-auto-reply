@@ -63,6 +63,22 @@
 
       <!-- ========== DASHBOARD ========== -->
       <section id="section-dashboard" class="section active">
+
+        <!-- Connected Page Status -->
+        <div id="pageStatusBanner" class="card" style="border-left:4px solid #ef4444;margin-bottom:20px;">
+          <div style="padding:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <i class="fas fa-exclamation-triangle" style="font-size:1.5rem;color:#ef4444;" id="pageStatusIcon"></i>
+              <div>
+                <strong id="pageStatusTitle" style="font-size:0.95rem;">Page Not Connected</strong>
+                <p id="pageStatusDesc" style="margin:0;font-size:0.82rem;color:var(--gray);">Connect your Facebook Page to start receiving messages.</p>
+              </div>
+            </div>
+            <a href="#" onclick="document.querySelector('[data-section=profile]').click()" class="btn btn-primary" style="padding:8px 16px;font-size:0.82rem;" id="pageStatusBtn"><i class="fas fa-plug"></i> Connect Page</a>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
         <div class="stats-grid">
           <div class="stat-card stat-blue">
             <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
@@ -72,24 +88,24 @@
             </div>
           </div>
           <div class="stat-card stat-green">
+            <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+            <div class="stat-info">
+              <span class="stat-number" id="totalReceived">0</span>
+              <span class="stat-label">Messages Received</span>
+            </div>
+          </div>
+          <div class="stat-card stat-purple">
+            <div class="stat-icon"><i class="fas fa-reply-all"></i></div>
+            <div class="stat-info">
+              <span class="stat-number" id="totalReplied">0</span>
+              <span class="stat-label">Auto Replies Sent</span>
+            </div>
+          </div>
+          <div class="stat-card stat-whatsapp">
             <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
             <div class="stat-info">
               <span class="stat-number" id="activeRules">0</span>
               <span class="stat-label">Active Rules</span>
-            </div>
-          </div>
-          <div class="stat-card stat-purple">
-            <div class="stat-icon"><i class="fab fa-facebook-messenger"></i></div>
-            <div class="stat-info">
-              <span class="stat-number" id="messengerRules">0</span>
-              <span class="stat-label">Messenger</span>
-            </div>
-          </div>
-          <div class="stat-card stat-whatsapp">
-            <div class="stat-icon"><i class="fab fa-whatsapp"></i></div>
-            <div class="stat-info">
-              <span class="stat-number" id="whatsappRules">0</span>
-              <span class="stat-label">WhatsApp</span>
             </div>
           </div>
         </div>

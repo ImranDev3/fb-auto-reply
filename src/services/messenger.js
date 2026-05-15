@@ -102,6 +102,13 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
       // Keyword matched - send rule reply
       console.log(`✅ [${user?.email || 'global'}] Keyword "${matchedRule.keyword}" matched.`);
       await sendMessage(senderId, matchedRule.reply, accessToken);
+      // Update stats
+      if (user) {
+        await User.findByIdAndUpdate(user._id, { 
+          $inc: { 'messageStats.totalReceived': 1, 'messageStats.totalReplied': 1 },
+          'messageStats.lastMessageAt': new Date()
+        });
+      }
     } else {
       // No keyword matched - use AI or default reply
       console.log(`🔍 [${user?.email || 'global'}] No keyword match. Trying AI...`);
@@ -148,6 +155,12 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
           console.log(`🤖 [${user?.email || 'global'}] AI reply sent.`);
           await sendMessage(senderId, aiReply, accessToken);
           replied = true;
+          if (user) {
+            await User.findByIdAndUpdate(user._id, { 
+              $inc: { 'messageStats.totalReceived': 1, 'messageStats.totalReplied': 1 },
+              'messageStats.lastMessageAt': new Date()
+            });
+          }
         }
       }
 
@@ -155,6 +168,20 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
       if (!replied && settings.isAwayMode) {
         console.log(`🌙 [${user?.email || 'global'}] Sending default reply.`);
         await sendMessage(senderId, settings.defaultReply || 'Thanks for your message!', accessToken);
+        if (user) {
+          await User.findByIdAndUpdate(user._id, { 
+            $inc: { 'messageStats.totalReceived': 1, 'messageStats.totalReplied': 1 },
+            'messageStats.lastMessageAt': new Date()
+          });
+        }
+      } else if (!replied) {
+        // Message received but not replied
+        if (user) {
+          await User.findByIdAndUpdate(user._id, { 
+            $inc: { 'messageStats.totalReceived': 1 },
+            'messageStats.lastMessageAt': new Date()
+          });
+        }
       }
     }
   } catch (error) {

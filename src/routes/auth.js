@@ -103,7 +103,23 @@ router.post('/login', async (req, res) => {
 
 // ============ GET PROFILE ============
 router.get('/me', protect, async (req, res) => {
-  res.json({ success: true, data: req.user });
+  const user = await User.findById(req.user._id).select('-password');
+  res.json({ success: true, data: user });
+});
+
+// ============ GET MESSAGE STATS ============
+router.get('/stats', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('messageStats pageDetails');
+    res.json({ success: true, data: {
+      totalReceived: user.messageStats?.totalReceived || 0,
+      totalReplied: user.messageStats?.totalReplied || 0,
+      lastMessageAt: user.messageStats?.lastMessageAt || null,
+      isPageConnected: !!(user.pageDetails?.pageAccessToken)
+    }});
+  } catch (e) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 });
 
 // ============ UPDATE PROFILE ============
