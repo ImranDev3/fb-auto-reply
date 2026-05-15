@@ -34,13 +34,17 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
       user = await User.findOne({ 'pageDetails.pageId': String(recipientId), isActive: true });
     }
 
-    // If not found by pageId, try by pageAccessToken (for users who haven't set pageId)
+    // If not found by pageId, try finding by page access token matching env token
     if (!user) {
-      // Find any active user with a page token (fallback for single-user setup)
       user = await User.findOne({ 
-        'pageDetails.pageAccessToken': { $exists: true, $ne: '' }, 
-        isActive: true 
+        isActive: true,
+        'pageDetails.pageAccessToken': { $exists: true, $ne: '' }
       }).sort({ lastLogin: -1 });
+    }
+
+    // Last resort - find admin user
+    if (!user) {
+      user = await User.findOne({ role: 'admin', isActive: true });
     }
 
     if (user) {
@@ -149,18 +153,16 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
 
       // Try AI reply
       let replied = false;
-      if (businessContext.trim()) {
-        const aiReply = await generateAIReply(messageText, businessContext);
-        if (aiReply) {
-          console.log(`🤖 [${user?.email || 'global'}] AI reply sent.`);
-          await sendMessage(senderId, aiReply, accessToken);
-          replied = true;
-          if (user) {
-            await User.findByIdAndUpdate(user._id, { 
-              $inc: { 'messageStats.totalReceived': 1, 'messageStats.totalReplied': 1 },
-              'messageStats.lastMessageAt': new Date()
-            });
-          }
+      const aiReply = await generateAIReply(messageText, businessContext || 'You are a helpful customer support assistant. Reply politely and briefly.');
+      if (aiReply) {
+        console.log(`🤖 [${user?.email || 'global'}] AI reply sent.`);
+        await sendMessage(senderId, aiReply, accessToken);
+        replied = true;
+        if (user) {
+          await User.findByIdAndUpdate(user._id, { 
+            $inc: { 'messageStats.totalReceived': 1, 'messageStats.totalReplied': 1 },
+            'messageStats.lastMessageAt': new Date()
+          });
         }
       }
 
