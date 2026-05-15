@@ -90,8 +90,13 @@ async function handleIncomingMessage(senderId, messageText, recipientId) {
       await sendMessage(senderId, matchedRule.reply, accessToken);
     } else if (settings.isAwayMode) {
       // No keyword matched — try Gemini AI first
-      // Build business context from user's business details + products
+      // Build business context from user's business details + products + AI context
       let businessContext = '';
+
+      // Use AI Context (client's custom instructions) as primary source
+      if (settings.aiContext) {
+        businessContext += settings.aiContext + '\n\n';
+      }
       
       if (user) {
         const bd = user.businessDetails || {};

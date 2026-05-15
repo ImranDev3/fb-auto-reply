@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
 // ============ UPDATE SETTINGS ============
 router.put('/', async (req, res) => {
   try {
-    const { defaultReply, isAutoReplyEnabled, isAwayMode, awayMessage, greetingMessage, isGreetingEnabled } = req.body;
+    const { defaultReply, isAutoReplyEnabled, isAwayMode, awayMessage, greetingMessage, isGreetingEnabled, aiContext } = req.body;
 
     let settings = await Settings.findOne({ userId: req.user._id });
     if (!settings) {
@@ -42,6 +42,7 @@ router.put('/', async (req, res) => {
     if (awayMessage !== undefined) settings.awayMessage = awayMessage;
     if (greetingMessage !== undefined) settings.greetingMessage = greetingMessage;
     if (isGreetingEnabled !== undefined) settings.isGreetingEnabled = isGreetingEnabled;
+    if (aiContext !== undefined) settings.aiContext = aiContext;
 
     await settings.save();
     res.json({ success: true, data: settings });

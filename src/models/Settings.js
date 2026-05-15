@@ -17,6 +17,12 @@ const settingsSchema = new mongoose.Schema({
     ref: 'User',
     required: false
   },
+  // AI Reply Instructions - client writes their business info here
+  // AI uses this to generate smart replies
+  aiContext: {
+    type: String,
+    default: ''
+  },
   // Default reply when no keyword matches
   defaultReply: {
     type: String,

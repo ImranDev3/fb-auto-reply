@@ -168,8 +168,13 @@
             </div>
           </div>
           <div class="settings-messages">
+            <div class="form-group" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin-bottom:20px;">
+              <label style="font-size:1rem;color:#166534;"><i class="fas fa-robot"></i> <strong>AI Reply — Your Business Info</strong></label>
+              <p style="font-size:0.82rem;color:#15803d;margin:6px 0 12px;">Write everything about your business here. AI will use this to reply customers intelligently. Include: products, prices, delivery info, offers, hours, policies — anything a customer might ask.</p>
+              <textarea id="aiContext" rows="6" placeholder="Example:&#10;Ami clothing sell kori. Products: T-shirt 500tk, Polo 800tk, Hoodie 1200tk.&#10;Delivery: Dhaka 60tk (1-2 din), outside 120tk (3-5 din).&#10;Payment: bKash, Nagad, COD available.&#10;Size: S, M, L, XL available.&#10;Return: 3 din er moddhe return korte parbe.&#10;Offer: 2ta kinle 10% discount."></textarea>
+            </div>
             <div class="form-group">
-              <label><i class="fas fa-comment-dots"></i> Default Reply</label>
+              <label><i class="fas fa-comment-dots"></i> Default Reply (when AI is off/fails)</label>
               <textarea id="defaultReply" rows="2" placeholder="Thanks for your message!"></textarea>
             </div>
             <div class="form-group">

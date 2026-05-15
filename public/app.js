@@ -306,6 +306,7 @@ async function fetchSettings() {
       document.getElementById('defaultReply').value = s.defaultReply || '';
       document.getElementById('awayMessage').value = s.awayMessage || '';
       document.getElementById('greetingMessage').value = s.greetingMessage || '';
+      document.getElementById('aiContext').value = s.aiContext || '';
     }
   } catch (error) {
     console.error('Error fetching settings:', error);
@@ -320,7 +321,8 @@ async function saveSettings() {
       isGreetingEnabled: document.getElementById('toggleGreeting').checked,
       defaultReply: document.getElementById('defaultReply').value.trim(),
       awayMessage: document.getElementById('awayMessage').value.trim(),
-      greetingMessage: document.getElementById('greetingMessage').value.trim()
+      greetingMessage: document.getElementById('greetingMessage').value.trim(),
+      aiContext: document.getElementById('aiContext').value.trim()
     };
 
     const res = await fetch('/api/settings', {
