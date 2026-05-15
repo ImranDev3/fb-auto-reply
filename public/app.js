@@ -1,17 +1,15 @@
 /**
- * Auto Reply SaaS - Frontend JavaScript
+ * AutoReply Pro - Professional Dashboard JavaScript
  * 
- * Handles:
- * - Fetching and displaying rules
- * - Adding new rules (with platform selection)
- * - Editing rules
- * - Deleting rules
- * - Filtering by platform
- * - Stats display
+ * Features:
+ * - Section navigation (Dashboard, Rules, Settings)
+ * - CRUD operations for rules
+ * - Settings management
+ * - Filter & Stats
  * - Toast notifications
+ * - Responsive sidebar
  */
 
-// API base URL
 const API_URL = '/api/rules';
 
 // DOM Elements
@@ -20,18 +18,49 @@ const keywordInput = document.getElementById('keyword');
 const replyInput = document.getElementById('reply');
 const platformSelect = document.getElementById('platform');
 const rulesContainer = document.getElementById('rulesContainer');
+const formBtnText = document.getElementById('formBtnText');
 
 // State
 let editingRuleId = null;
 let allRules = [];
 let currentFilter = 'all';
 
-// ============ LOAD ON PAGE LOAD ============
+// ============ INITIALIZATION ============
 document.addEventListener('DOMContentLoaded', () => {
   fetchRules();
   fetchSettings();
+  setupNavigation();
   setupFilterButtons();
 });
+
+// ============ NAVIGATION ============
+function setupNavigation() {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const section = item.dataset.section;
+
+      // Update active nav
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+
+      // Show section
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(`section-${section}`).classList.add('active');
+
+      // Update title
+      const titles = { dashboard: 'Dashboard', rules: 'Rules', settings: 'Settings' };
+      document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
+
+      // Close sidebar on mobile
+      document.getElementById('sidebar').classList.remove('open');
+    });
+  });
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
 
 // ============ FILTER BUTTONS ============
 function setupFilterButtons() {
@@ -68,7 +97,7 @@ ruleForm.addEventListener('submit', async (e) => {
       await updateRule(editingRuleId, { keyword, reply, platform });
       showToast('Rule updated successfully!', 'success');
       editingRuleId = null;
-      ruleForm.querySelector('button[type="submit"]').textContent = 'Add Rule';
+      formBtnText.textContent = 'Add Rule';
     } else {
       await createRule({ keyword, reply, platform });
       showToast('Rule added successfully!', 'success');
@@ -97,7 +126,8 @@ async function fetchRules() {
       } else {
         rulesContainer.innerHTML = `
           <div class="empty-state">
-            <p>No rules yet. Add your first auto-reply rule above! ☝️</p>
+            <i class="fas fa-inbox"></i>
+            <p>No rules yet. Add your first auto-reply rule!</p>
           </div>
         `;
       }
@@ -105,10 +135,10 @@ async function fetchRules() {
   } catch (error) {
     rulesContainer.innerHTML = `
       <div class="empty-state">
-        <p>❌ Error loading rules. Is the server running?</p>
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>Error loading rules. Is the server running?</p>
       </div>
     `;
-    console.error('Error fetching rules:', error);
   }
 }
 
@@ -120,11 +150,12 @@ function updateStats(rules) {
   document.getElementById('whatsappRules').textContent = rules.filter(r => r.platform === 'whatsapp' || r.platform === 'both').length;
 }
 
-// ============ RENDER RULES LIST ============
+// ============ RENDER RULES ============
 function renderRules(rules) {
   if (rules.length === 0) {
     rulesContainer.innerHTML = `
       <div class="empty-state">
+        <i class="fas fa-filter"></i>
         <p>No rules found for this filter.</p>
       </div>
     `;
@@ -132,80 +163,93 @@ function renderRules(rules) {
   }
 
   rulesContainer.innerHTML = rules.map(rule => `
-    <div class="rule-item" data-id="${rule._id}">
+    <div class="rule-item">
       <div class="rule-info">
         <div class="rule-keyword">
-          🔑 ${escapeHtml(rule.keyword)}
+          <i class="fas fa-key" style="color: var(--primary); font-size: 0.8rem;"></i>
+          ${escapeHtml(rule.keyword)}
         </div>
-        <div class="rule-reply">💬 ${escapeHtml(rule.reply)}</div>
+        <div class="rule-reply"><i class="fas fa-reply" style="font-size: 0.75rem;"></i> ${escapeHtml(rule.reply)}</div>
         <div class="rule-meta">
           <span class="badge ${rule.isActive ? 'badge-active' : 'badge-inactive'}">
-            ${rule.isActive ? 'Active' : 'Inactive'}
+            ${rule.isActive ? '● Active' : '● Inactive'}
           </span>
           <span class="badge badge-${rule.platform || 'both'}">
-            ${getPlatformLabel(rule.platform)}
+            ${getPlatformIcon(rule.platform)} ${getPlatformLabel(rule.platform)}
           </span>
         </div>
       </div>
       <div class="rule-actions">
         <button class="btn btn-edit" onclick="editRule('${rule._id}', '${escapeAttr(rule.keyword)}', '${escapeAttr(rule.reply)}', '${rule.platform || 'both'}')">
-          ✏️ Edit
+          <i class="fas fa-pen"></i> Edit
         </button>
         <button class="btn btn-danger" onclick="deleteRule('${rule._id}')">
-          🗑️ Delete
+          <i class="fas fa-trash"></i> Delete
         </button>
       </div>
     </div>
   `).join('');
 }
 
-// ============ PLATFORM LABEL ============
+// ============ HELPERS ============
 function getPlatformLabel(platform) {
   switch (platform) {
-    case 'messenger': return '💬 Messenger';
-    case 'whatsapp': return '📱 WhatsApp';
-    case 'both': 
-    default: return '🔗 Both';
+    case 'messenger': return 'Messenger';
+    case 'whatsapp': return 'WhatsApp';
+    default: return 'Both';
   }
 }
 
-// ============ CREATE RULE ============
-async function createRule(ruleData) {
-  const response = await fetch(API_URL, {
+function getPlatformIcon(platform) {
+  switch (platform) {
+    case 'messenger': return '<i class="fab fa-facebook-messenger"></i>';
+    case 'whatsapp': return '<i class="fab fa-whatsapp"></i>';
+    default: return '<i class="fas fa-link"></i>';
+  }
+}
+
+// ============ CRUD OPERATIONS ============
+async function createRule(data) {
+  const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(ruleData)
+    body: JSON.stringify(data)
   });
-  return response.json();
+  return res.json();
 }
 
-// ============ UPDATE RULE ============
-async function updateRule(id, ruleData) {
-  const response = await fetch(`${API_URL}/${id}`, {
+async function updateRule(id, data) {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(ruleData)
+    body: JSON.stringify(data)
   });
-  return response.json();
+  return res.json();
 }
 
-// ============ EDIT RULE ============
 function editRule(id, keyword, reply, platform) {
   editingRuleId = id;
   keywordInput.value = keyword;
   replyInput.value = reply;
   platformSelect.value = platform || 'both';
-  ruleForm.querySelector('button[type="submit"]').textContent = 'Update Rule';
+  formBtnText.textContent = 'Update Rule';
+
+  // Switch to dashboard section and scroll to form
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('[data-section="dashboard"]').classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-dashboard').classList.add('active');
+  document.getElementById('pageTitle').textContent = 'Dashboard';
+
   ruleForm.scrollIntoView({ behavior: 'smooth' });
 }
 
-// ============ DELETE RULE ============
 async function deleteRule(id) {
   if (!confirm('Are you sure you want to delete this rule?')) return;
 
   try {
-    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    const data = await response.json();
+    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    const data = await res.json();
 
     if (data.success) {
       showToast('Rule deleted!', 'success');
@@ -215,39 +259,14 @@ async function deleteRule(id) {
     }
   } catch (error) {
     showToast('Error deleting rule', 'error');
-    console.error(error);
   }
-}
-
-// ============ TOAST NOTIFICATION ============
-function showToast(message, type = 'success') {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.remove(), 3000);
-}
-
-// ============ UTILITY FUNCTIONS ============
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function escapeAttr(text) {
-  return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 
 // ============ SETTINGS ============
 async function fetchSettings() {
   try {
-    const response = await fetch('/api/settings');
-    const data = await response.json();
+    const res = await fetch('/api/settings');
+    const data = await res.json();
 
     if (data.success) {
       const s = data.data;
@@ -265,7 +284,7 @@ async function fetchSettings() {
 
 async function saveSettings() {
   try {
-    const settingsData = {
+    const settings = {
       isAutoReplyEnabled: document.getElementById('toggleAutoReply').checked,
       isAwayMode: document.getElementById('toggleAwayMode').checked,
       isGreetingEnabled: document.getElementById('toggleGreeting').checked,
@@ -274,20 +293,41 @@ async function saveSettings() {
       greetingMessage: document.getElementById('greetingMessage').value.trim()
     };
 
-    const response = await fetch('/api/settings', {
+    const res = await fetch('/api/settings', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settingsData)
+      body: JSON.stringify(settings)
     });
 
-    const data = await response.json();
+    const data = await res.json();
     if (data.success) {
-      showToast('Settings saved! ✅', 'success');
+      showToast('Settings saved successfully!', 'success');
     } else {
       showToast('Error saving settings', 'error');
     }
   } catch (error) {
     showToast('Error saving settings', 'error');
-    console.error(error);
   }
+}
+
+// ============ TOAST ============
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+  container.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// ============ UTILITIES ============
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function escapeAttr(text) {
+  return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
